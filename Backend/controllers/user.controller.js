@@ -1,3 +1,4 @@
+import e from "express";
 import User from "../models/user.model.js";
 import mongoosePaginate from "mongoose-paginate-v2";
 
@@ -8,7 +9,7 @@ import mongoosePaginate from "mongoose-paginate-v2";
  * @param {Object} res - The response object
  * @returns {Object} - All users
  * @pmethod GET
- * @example http://localhost:3050/user
+ * @example http://localhost:3050/users/
  */
 export const getAllUsers = async (req, res) => {
   try {
@@ -26,7 +27,7 @@ export const getAllUsers = async (req, res) => {
  * @param {Object} res - The response object
  * @returns {Object} - User by ID
  * @pmethod GET
- * @example http://localhost:3050/user/:id
+ * @example http://localhost:3050/users/profile/:id
  */
 export const getUserById = async (req, res) => {
   try {
@@ -49,20 +50,23 @@ export const getUserById = async (req, res) => {
  * @returns  message
  * @require -  authenticate middlewar and authorize middleware
  * @method PATCH
- * @example http://localhost:3050/user/:id
+ * @example http://localhost:3050/users/update/:id
  */
 export const updateUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const { id } = req.params; // Obtener el ID del usuario de los parámetros de la ruta
+    const updates = req.body; // Obtener los datos de actualización del cuerpo de la solicitud
+    // Encontrar al usuario por ID y actualizarlo con los nuevos datos
+    const user = await User.findByIdAndUpdate(id, updates);
     if (!user || user.deleted) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).send({ error: "User not found" });
+    } else {
+      await user.save();
+      res.send({ message: "User updated successfully" });
     }
-    user.username = req.body.username;
-    user.email = req.body.email;
-    await user.save();
-    res.json(user);
+    res.send(user); // Enviar la respuesta con el usuario actualizado
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(400).send(error); // Manejar errores y enviar una respuesta con código 400
   }
 };
 

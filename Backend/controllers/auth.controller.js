@@ -13,17 +13,26 @@ import jwt from "jsonwebtoken";
  *@example http://localhost:3050/user/createUser
  */
 export const createUser = async (req, res) => {
-  const user = new User(req.body);
-  user.password = await bcrypt.hash(user.password, 8);
+  const { username, email, password, role } = req.body;
   try {
+    // Verifica si el usuario o correo ya existen
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      return res
+        .status(409)
+        .send({ error: "Username or email already in use." });
+    }
+
+    // Si no existe, crea el nuevo usuario
+    const user = new User({ username, email, password, role });
+    user.password = bcrypt.hashSync(user.password, 8);
     await user.save();
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
     res.status(201).send({ user, token });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(400).send(error);
   }
 };
-
 /**
  *Logs in a user
  *@function loginUser
