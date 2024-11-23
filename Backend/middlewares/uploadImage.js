@@ -38,4 +38,5 @@ const limits = {
 /**
  * Allows to export the function
  */
-export const upload = multer({ storage, fileFilter, limits });
+const upload = multer({ storage, fileFilter, limits });
+export default upload;

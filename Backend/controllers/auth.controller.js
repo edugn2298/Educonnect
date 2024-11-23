@@ -45,7 +45,12 @@ export const createUser = async (req, res) => {
  */
 export const loginUser = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({
+      $or: [
+        { email: req.body.emailOrUsername },
+        { username: req.body.emailOrUsername },
+      ],
+    });
     if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
