@@ -6,6 +6,7 @@ import {
   getPostById,
   updatePost,
   deletePost,
+  prueba,
 } from "../controllers/post.controller.js";
 import uploadImage from "../middlewares/uploadImage.js";
 
@@ -14,18 +15,9 @@ import uploadImage from "../middlewares/uploadImage.js";
  */
 const routerPost = Router();
 
-/**
- * Get all posts
- * @function getAllPosts
- * @Method GET
- */
+/*
 routerPost.get("/", authenticate, authorize(["admin"]), getAllPosts);
 
-/**
- * Get post by ID
- * @function getPostById
- * @Method GET
- */
 routerPost.get(
   "/post/:id",
   authenticate,
@@ -33,11 +25,6 @@ routerPost.get(
   getPostById
 );
 
-/**
- * Update post
- * @function updatePost
- * @Method PATCH
- */
 routerPost.patch(
   "/update/:id",
   authenticate,
@@ -45,11 +32,6 @@ routerPost.patch(
   updatePost
 );
 
-/**
- * Delete post
- * @function deletePost
- * @Method DELETE
- */
 routerPost.patch(
   "/delete/:id",
   authenticate,
@@ -57,11 +39,6 @@ routerPost.patch(
   deletePost
 );
 
-/**
- * Create post
- * @function createPost
- * @Method POST
- */
 routerPost.post(
   " /create",
   authenticate,
@@ -69,5 +46,18 @@ routerPost.post(
   uploadImage.single("image"),
   createPost
 );
+*/
+
+routerPost.get("/", getAllPosts);
+
+routerPost.get("/post/:id", getPostById);
+
+routerPost.patch("/update/:id", updatePost);
+
+routerPost.patch("/delete/:id", deletePost);
+
+routerPost.post("/create", uploadImage.single("image"), createPost);
+
+routerPost.get("/prueba", prueba);
 
 export default routerPost;

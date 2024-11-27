@@ -1,5 +1,13 @@
 import Post from "../models/post.model.js";
 
+export const prueba = async (req, res) => {
+  try {
+    res.json({ message: "Hola mundo" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 /**
  * Get all posts
  * @function getAllPosts
@@ -15,7 +23,7 @@ import Post from "../models/post.model.js";
 export const getAllPosts = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
-    const post = await Post.mongoosePaginate(
+    const post = await Post.paginate(
       { deleted: false },
       {
         page,
@@ -70,7 +78,7 @@ export const searchPosts = async (req, res) => {
     if (!search) {
       return res.status(400).json({ error: "Search query is required" });
     }
-    const posts = await Post.mongoosePaginate(
+    const posts = await Post.Paginate(
       { deleted: false, title: { $regex: search, $options: "i" } },
       {
         page,
@@ -107,8 +115,9 @@ export const searchPosts = async (req, res) => {
 export const createPost = async (req, res) => {
   try {
     if (req.file) {
-      req.body.image = `http://localhost:3050/${req.file.filename}`; // Asegúrate de usar path.resolve para definir la ruta correcta
+      req.body.image = `http://localhost:3005/${req.file.filename}`; // Asegúrate de usar path.resolve para definir la ruta correcta
     }
+    console.log(req.body);
     const post = await Post.create(req.body);
     res.status(201).json(post);
   } catch (error) {
@@ -117,6 +126,7 @@ export const createPost = async (req, res) => {
     } else {
       return res.status(500).json({ error: error.message });
     }
+    return res.json({ error: error.message });
   }
 };
 

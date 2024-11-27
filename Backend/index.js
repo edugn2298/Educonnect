@@ -2,7 +2,7 @@ import { config } from "dotenv"; //importing dotenv
 config({ path: "./config/.env" }); //configuring dotenv
 
 import mongoose from "mongoose"; //importing mongoose
-import app from "./app.js";
+import { app, server } from "./app.js";
 
 const PORT = process.env.PORT || 3050; //defining port
 
@@ -18,6 +18,6 @@ async function connectDB() {
 }
 connectDB();
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

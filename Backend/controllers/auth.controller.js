@@ -55,8 +55,18 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    localStorage.setItem("token", "tu_token_jwt");
     res.status(200).send({ user, token });
   } catch (error) {
     res.status(400).send({ error: "Invalid email or password" });
+  }
+};
+
+export const logOutUser = async (req, res) => {
+  try {
+    localStorage.removeItem("token");
+    res.status(200).send({ message: "User logged out successfully." });
+  } catch (error) {
+    res.status(400).send(error);
   }
 };

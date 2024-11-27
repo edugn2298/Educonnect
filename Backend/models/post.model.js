@@ -19,48 +19,47 @@ import mongoosePaginate from "mongoose-paginate-v2";
  * @property {string} updatedAt - The updated at of the post.
  */
 
-const postSchema = new mongoose.Schema({
-  author: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  content: {
-    type: String,
-    default: "",
-  },
-  media: [
-    {
+const postSchema = new mongoose.Schema(
+  {
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    content: {
       type: String,
       default: "",
     },
-  ],
-  likes: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+    media: [
+      {
+        type: String,
+        default: "",
+      },
+    ],
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    comments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
+    hashtags: [
+      {
+        type: String,
+      },
+    ],
+    deleted: {
+      type: Boolean,
+      default: false,
     },
-  ],
-  comments: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Comment",
-    },
-  ],
-  hashtags: [
-    {
-      type: String,
-    },
-  ],
-  createdAt: {
-    type: Date,
-    default: Date.now,
   },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }
+);
 
 /**
  * Plugin for pagination

@@ -13,6 +13,7 @@ router.get("/", getAllUsers);
 router.get("/profile/:id", getUserById);
 router.patch("/update/:id", updateUser);
 router.patch("/delete/:id", deleteUser);
+
 /*
 router.get("/", authenticate, authorize(["admin"]), getAllUsers);
 router.get("/profile", authenticate, getUserById);
