@@ -1,5 +1,14 @@
 import Chat from "../models/chat.model.js";
 
+/**
+ * create chat
+ * @async
+ * @requires - authenticate middleware
+ * @requires - authorize middleware
+ * @method POST
+ * @example http://localhost:3050/chats
+ * @returns {Object} - The created chat
+ */
 export const createChat = async (req, res) => {
   const chat = await Chat.create({
     users: [req.user._id, req.body.userId],
@@ -12,6 +21,15 @@ export const createChat = async (req, res) => {
   }
 };
 
+/**
+ * get all chats for user
+ * @async
+ * @requires - authenticate middleware
+ * @method GET
+ * @example http://localhost:3050/chats
+ * @param {*} req - The request object
+ * @param {*} res  - The response object
+ */
 export const getChatsForUser = async (req, res) => {
   try {
     const chats = await Chat.find({
@@ -24,6 +42,15 @@ export const getChatsForUser = async (req, res) => {
   }
 };
 
+/**
+ * get chat by id
+ * @async
+ * @requires - authenticate middleware
+ * @method GET
+ * @example http://localhost:3050/chats/:id
+ * @param {*} req - The request object
+ * @param {*} res  - The response object
+ */
 export const findChat = async (req, res) => {
   try {
     const chat = await Chat.findOne({
@@ -38,6 +65,15 @@ export const findChat = async (req, res) => {
   }
 };
 
+/**
+ * delete chat by id
+ * @async
+ * @requires - authenticate middleware
+ * @method DELETE
+ * @example http://localhost:3050/chats/:id
+ * @param {*} req - The request object
+ * @param {*} res  - The response object
+ */
 export const deleteChat = async (req, res) => {
   try {
     const chat = await Chat.findOneAndUpdate(

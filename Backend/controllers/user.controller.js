@@ -1,6 +1,4 @@
-import e from "express";
 import User from "../models/user.model.js";
-import mongoosePaginate from "mongoose-paginate-v2";
 
 /**
  * Get all users

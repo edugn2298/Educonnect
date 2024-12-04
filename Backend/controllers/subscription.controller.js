@@ -1,5 +1,13 @@
 import Subscription from "../models/subscription.model.js";
 
+/**
+ * get all subscriptions
+ * @function getSubscriptions
+ * @async - The function is asynchronous
+ * @param {*} req - The request object
+ * @param {*} res - The response object
+ * @returns {Object} - The subscriptions
+ */
 export const getSubscriptions = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
@@ -16,6 +24,14 @@ export const getSubscriptions = async (req, res) => {
   }
 };
 
+/**
+ * get subscription by id
+ * @function getSubscriptionById
+ * @async - The function is asynchronous
+ * @param {*} req - The request object
+ * @param {*} res - The response object
+ * @returns {Object} - The subscription
+ */
 export const getSubscriptionById = async (req, res) => {
   try {
     const subscription = await Subscription.findById(req.params.id);
@@ -28,6 +44,14 @@ export const getSubscriptionById = async (req, res) => {
   }
 };
 
+/**
+ * create subscription
+ * @function createSubscription
+ * @async - The function is asynchronous
+ * @param {*} req - The request object
+ * @param {*} res - The response object
+ * @returns {Object} - The subscription
+ */
 export const createSubscription = async (req, res) => {
   try {
     const subscription = await Subscription.create(req.body);
@@ -41,6 +65,17 @@ export const createSubscription = async (req, res) => {
   }
 };
 
+/**
+ * update subscription
+ * @function updateSubscription
+ * @async - The function is asynchronous
+ * @param {*} req - The request object
+ * @param {*} res - The response object
+ * @returns {Object} - The subscription
+ * @method PATCH
+ * @returns {Object} - The updated subscription
+ * @returns {Object} - The subscription
+ */
 export const updateSubscription = async (req, res) => {
   try {
     const subscription = await Subscription.findOneAndUpdate(
@@ -61,6 +96,15 @@ export const updateSubscription = async (req, res) => {
   }
 };
 
+/**
+ * delete subscription
+ * @function deleteSubscription
+ * @async - The function is asynchronous
+ * @param {*} req - The request object
+ * @param {*} res - The response object
+ * @method PATCH
+ * @returns {Object} - The deleted subscription
+ */
 export const deleteSubscription = async (req, res) => {
   try {
     const subscription = await Subscription.findOneAndUpdate(

@@ -62,6 +62,11 @@ export const loginUser = async (req, res) => {
   }
 };
 
+/**
+ * Logs out a user
+ * @function logOutUser
+ */
+
 export const logOutUser = async (req, res) => {
   try {
     localStorage.removeItem("token");
