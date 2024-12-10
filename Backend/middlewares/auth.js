@@ -1,22 +1,27 @@
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import User from "../models/user.model.js";
 
 export const authenticate = async (req, res, next) => {
-  const token = req.header("Authorization").replace("Bearer ", "");
   try {
+    const token = req.header("Authorization").replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findOne({ _id: decoded._id });
+    // Usar new para crear un nuevo ObjectId
+    const user = await User.findOne({
+      _id: new mongoose.Types.ObjectId(decoded.id),
+    });
 
     if (!user) {
-      throw new Error();
+      throw new Error("User not found");
     }
 
     req.user = user;
     next();
   } catch (error) {
-    res.status(401).send({ error: "Please authenticate." });
-    console.log(error);
-    console.log(token);
+    console.log("Error:", error); // Ver el error
+    res
+      .status(401)
+      .send({ error: "Invalid token. Please authenticate again." });
   }
 };
 

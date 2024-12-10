@@ -8,6 +8,7 @@ function updateTimestamp(next) {
 }
 
 // Aplicar en los esquemas
+/*
 userSchema.pre("findOneAndUpdate", updateTimestamp);
 userSchema.pre("updateOne", updateTimestamp);
 
@@ -16,3 +17,4 @@ commentSchema.pre("updateOne", updateTimestamp);
 
 postSchema.pre("findOneAndUpdate", updateTimestamp);
 postSchema.pre("updateOne", updateTimestamp);
+*/
