@@ -14,7 +14,10 @@ import {
  */
 const routerComment = Router();
 
-/*
+/**
+ * @method POST
+ * @description Create a new comment
+ */
 routerComment.post(
   "/",
   authenticate,
@@ -22,7 +25,10 @@ routerComment.post(
   createComment
 );
 
-
+/**
+ * @method GET
+ * @description Get all comments
+ */
 routerComment.get("/", authenticate, authorize(["admin"]), getAllComments);
 routerComment.get(
   "/:commentId",
@@ -31,10 +37,16 @@ routerComment.get(
   getCommentById
 );
 
-
+/**
+ * @method GET
+ * @description Get comments by post
+ */
 routerComment.get("/commentsbypost/:postId", getCommentsByPostId);
 
-
+/**
+ * @method PATCH
+ * @description Update a comment
+ */
 routerComment.patch(
   "/update/:commentId",
   authenticate,
@@ -42,20 +54,15 @@ routerComment.patch(
   updateComment
 );
 
-
+/**
+ * @method PATCH
+ * @description Delete a comment
+ */
 routerComment.patch(
   "/delete/:commentId",
   authenticate,
   authorize(["admin"]),
   deleteComment
 );
-*/
-
-routerComment.post("/", createComment);
-routerComment.get("/", authenticate, authorize(["admin"]), getAllComments);
-routerComment.get("/:commentId", getCommentById);
-routerComment.get("/commentsbypost/:postId", getCommentsByPostId);
-routerComment.patch("/update/:commentId", updateComment);
-routerComment.patch("/delete/:commentId", deleteComment);
 
 export default routerComment;

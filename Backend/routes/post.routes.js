@@ -15,16 +15,27 @@ import uploadImage from "../middlewares/uploadImage.js";
  */
 const routerPost = Router();
 
-/*
+/**
+ * @method GET
+ * @description Get all posts
+ */
 routerPost.get("/", authenticate, authorize(["admin"]), getAllPosts);
 
+/**
+ * @method GET
+ * @description Get post by id
+ */
 routerPost.get(
-  "/post/:id",
+  "/postbyid/:id",
   authenticate,
   authorize(["user", "admin"]),
   getPostById
 );
 
+/**
+ * @method PATCH
+ * @description Update post
+ */
 routerPost.patch(
   "/update/:id",
   authenticate,
@@ -32,6 +43,10 @@ routerPost.patch(
   updatePost
 );
 
+/**
+ * @method PATCH
+ * @description Delete post
+ */
 routerPost.patch(
   "/delete/:id",
   authenticate,
@@ -39,25 +54,16 @@ routerPost.patch(
   deletePost
 );
 
+/**
+ * @method POST
+ * @description Create post
+ */
 routerPost.post(
-  " /create",
+  "/create",
   authenticate,
   authorize(["user", "admin"]),
   uploadImage.single("image"),
   createPost
 );
-*/
-
-routerPost.get("/", getAllPosts);
-
-routerPost.get("/post/:id", getPostById);
-
-routerPost.patch("/update/:id", updatePost);
-
-routerPost.patch("/delete/:id", deletePost);
-
-routerPost.post("/create", uploadImage.single("image"), createPost);
-
-routerPost.get("/prueba", prueba);
 
 export default routerPost;

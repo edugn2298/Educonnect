@@ -16,8 +16,18 @@ router.patch("/delete/:id", deleteUser);
 */
 
 router.get("/", authenticate, authenticate, authorize(["admin"]), getAllUsers);
-router.get("/profile", authenticate, authorize(["user", "admin"]), getUserById);
-router.patch("/update", authenticate, authorize(["user", "admin"]), updateUser);
-router.delete("/delete", authenticate, authorize(["admin"]), deleteUser);
+router.get(
+  "/profile/:id",
+  authenticate,
+  authorize(["user", "admin"]),
+  getUserById
+);
+router.patch(
+  "/update/:id",
+  authenticate,
+  authorize(["user", "admin"]),
+  updateUser
+);
+router.patch("/delete/:id", authenticate, authorize(["admin"]), deleteUser);
 
 export default router;

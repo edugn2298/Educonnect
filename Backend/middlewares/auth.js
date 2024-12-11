@@ -6,7 +6,6 @@ export const authenticate = async (req, res, next) => {
   try {
     const token = req.header("Authorization").replace("Bearer ", "");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // Usar new para crear un nuevo ObjectId
     const user = await User.findOne({
       _id: new mongoose.Types.ObjectId(decoded.id),
     });
@@ -18,7 +17,7 @@ export const authenticate = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.log("Error:", error); // Ver el error
+    console.log("Error:", error);
     res
       .status(401)
       .send({ error: "Invalid token. Please authenticate again." });
