@@ -7,17 +7,38 @@ import {
   deleteChat,
 } from "../controllers/chat.controller.js";
 
+/**
+ * Chat routes
+ */
 const routerChat = Router();
-/*
-routerChat.post("/", authenticate, authorize(["user", "admin"]), createChat);
-routerChat.get("/", authenticate, authorize(["user", "admin"]), getChatsForUser);
-routerChat.get("/:id", authenticate, authorize(["user", "admin"]), getChatById);
-routerChat.delete("/:id", authenticate, authorize(["admin"]), deleteChat);
-*/
 
-routerChat.post("/", createChat);
-routerChat.get("/:userId", getChatsForUser);
-routerChat.get("/find/:firstId/:secondId", findChat);
-routerChat.delete("/:id", deleteChat);
+/**
+ * @method POST
+ * @description Create a new chat
+ */
+routerChat.post("/", authenticate, authorize(["user", "admin"]), createChat);
+
+/**
+ * @method GET
+ * @description Get chat by id
+ */
+routerChat.get("/:id", authenticate, authorize(["user", "admin"]), findChat);
+
+/**
+ * @method PATCH
+ * @description Delete chat by id
+ */
+routerChat.patch("/:id", authenticate, authorize(["admin"]), deleteChat);
+
+/**
+ * @method GET
+ * @description Get chat by id for user
+ */
+routerChat.get(
+  "/user/:userId",
+  authenticate,
+  authorize(["user", "admin"]),
+  getChatsForUser
+);
 
 export default routerChat;
