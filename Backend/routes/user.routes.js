@@ -8,12 +8,6 @@ import {
 } from "../controllers/user.controller.js";
 
 const router = Router();
-/*
-router.get("/", getAllUsers);
-router.get("/profile/:id", getUserById);
-router.patch("/update/:id", updateUser);
-router.patch("/delete/:id", deleteUser);
-*/
 
 router.get("/", authenticate, authenticate, authorize(["admin"]), getAllUsers);
 router.get(
