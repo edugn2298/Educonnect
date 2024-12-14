@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(null);
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -32,6 +33,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(user));
       setToken(token);
       setCurrentUser(user);
+      setRole(role);
     } catch (error) {
       console.error(error);
     }
@@ -44,6 +46,7 @@ export const AuthProvider = ({ children }) => {
       const { user, token } = response.data;
       setToken(token);
       setCurrentUser(user);
+      setRole(user.role);
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
     } catch (error) {
@@ -58,6 +61,7 @@ export const AuthProvider = ({ children }) => {
       setToken(null);
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      setRole(null);
     } catch (error) {
       console.error(error);
     }
@@ -68,6 +72,9 @@ export const AuthProvider = ({ children }) => {
     setCurrentUser,
     loading,
     setLoading,
+    register,
+    login,
+    logout,
   };
 
   AuthContext.propTypes = {
@@ -80,3 +87,9 @@ export const AuthProvider = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+AuthProvider.propTypes = {
+  children: PropTypes.node,
+};
+
+export default AuthProvider;
