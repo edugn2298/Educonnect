@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import classNames from "classnames";
 
-const Button = ({ children, className, variant, ...props }) => {
+const ButtonComponent = ({ children, className, variant, ...props }) => {
   const baseStyles =
     "flex items-center justify-center px-4 py-2 rounded focus:outline-none focus:ring";
   const variants = {
@@ -22,7 +22,7 @@ const Button = ({ children, className, variant, ...props }) => {
   );
 };
 
-Button.propTypes = {
+ButtonComponent.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string, // Añadir validación de className
   variant: PropTypes.oneOf([
@@ -32,8 +32,8 @@ Button.propTypes = {
   ]).isRequired,
 };
 
-Button.defaultProps = {
+ButtonComponent.defaultProps = {
   variant: "navbarButton", // Cambiado de variants a variant
 };
 
-export default Button;
+export default ButtonComponent;

@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 /**
- *Creates a new user
+ *@description creates a new user
  *@function createUser
  *@returns {Promise<void>}
  *@param {Object} req - The request object
@@ -34,10 +34,11 @@ export const createUser = async (req, res) => {
   }
 };
 /**
- *Logs in a user
+ *@description Logs in a user
  *@function loginUser
  *@returns {Promise<void>}
  *@param {Object} req - The request object
+
  *@param {Object} res - The response object
  *@returns {Obeject} - User and token or  Message
  *@method POST
@@ -63,7 +64,7 @@ export const loginUser = async (req, res) => {
 };
 
 /**
- * Logs out a user
+ * @description out a user
  * @function logOutUser
  */
 

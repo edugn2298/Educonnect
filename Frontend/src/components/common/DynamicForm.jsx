@@ -1,7 +1,9 @@
+import { useState } from "react";
 import PropTypes from "prop-types";
-import { validateField } from "../utils/validation";
+import { validateField } from "../../utils/validation";
+import { TextField, Button, Box, Typography, Link } from "@mui/material";
 
-const DynamicForm = ({ config, onSubmit }) => {
+export const DynamicForm = ({ config, onSubmit, buttons, links }) => {
   const [formData, setFormData] = useState(
     config.reduce((acc, field) => {
       acc[field.name] = "";
@@ -24,7 +26,7 @@ const DynamicForm = ({ config, onSubmit }) => {
     const newErrors = {};
 
     config.forEach((field) => {
-      const error = validateField(field, formData[field.name]);
+      const error = validateField(field, formData);
       if (error) {
         newErrors[field.name] = error;
       }
@@ -38,34 +40,54 @@ const DynamicForm = ({ config, onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      noValidate
+      className="max-w-lg mx-auto mt-10 p-5"
+    >
       {config.map((field) => (
-        <div key={field.name} className="mb-4">
-          <label className="block text-gray-700" htmlFor={field.name}>
-            {field.label}:
-          </label>
-          <input
+        <Box key={field.name} mb={3}>
+          <TextField
+            variant="outlined"
+            fullWidth
             type={field.type}
+            label={field.label}
             name={field.name}
-            id={field.name}
             value={formData[field.name]}
             onChange={handleChange}
             required={field.validation.required}
-            minLength={field.validation.minLength || undefined}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+            inputProps={{
+              minLength: field.validation.minLength || undefined,
+              pattern: field.validation.regex
+                ? field.validation.regex.source
+                : undefined,
+            }}
+            error={Boolean(errors[field.name])}
+            helperText={errors[field.name]}
           />
-          {errors[field.name] && (
-            <p className="text-red-500 text-sm mt-1">{errors[field.name]}</p>
-          )}
-        </div>
+        </Box>
       ))}
-      <button
-        type="submit"
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring"
-      >
-        Submit
-      </button>
-    </form>
+      {buttons &&
+        buttons.map((button, index) => (
+          <Button
+            key={index}
+            type={button.type || "button"}
+            variant="contained"
+            color="primary"
+            className="bg-blue-500 hover:bg-blue-700"
+            onClick={button.onClick}
+          >
+            {button.text}
+          </Button>
+        ))}
+      {links &&
+        links.map((link, index) => (
+          <Typography key={index} variant="body2" className="mt-4">
+            {link.text} <Link href={link.url}>{link.label}</Link>
+          </Typography>
+        ))}
+    </Box>
   );
 };
 
@@ -78,11 +100,29 @@ DynamicForm.propTypes = {
       validation: PropTypes.shape({
         required: PropTypes.bool,
         minLength: PropTypes.number,
-        regex: PropTypes.instanceOf(RegExp), // Validación por regex
+        regex: PropTypes.instanceOf(RegExp),
       }),
     })
   ).isRequired,
   onSubmit: PropTypes.func.isRequired,
+  buttons: PropTypes.arrayOf(
+    PropTypes.shape({
+      text: PropTypes.string.isRequired,
+      type: PropTypes.string, // "button" or "submit"
+      onClick: PropTypes.func, // Optional onClick handler
+    })
+  ).isRequired,
+  links: PropTypes.arrayOf(
+    PropTypes.shape({
+      text: PropTypes.string.isRequired,
+      url: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+    })
+  ),
+};
+
+DynamicForm.defaultProps = {
+  links: [],
 };
 
 export default DynamicForm;

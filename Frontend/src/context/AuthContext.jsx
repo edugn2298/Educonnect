@@ -3,10 +3,10 @@ import PropTypes from "prop-types";
 import {
   login as loginApi,
   logout as logoutApi,
-  register as registerApi,
+  createUser as registerApi,
 } from "../services/auth";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(null);
-  const [role, setRole] = useState(null);
 
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -33,7 +32,6 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(user));
       setToken(token);
       setCurrentUser(user);
-      setRole(role);
     } catch (error) {
       console.error(error);
     }
@@ -43,12 +41,16 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await loginApi(emailOrUsername, password);
-      const { user, token } = response.data;
-      setToken(token);
-      setCurrentUser(user);
-      setRole(user.role);
-      localStorage.setItem("token", token);
-      localStorage.setItem("user", JSON.stringify(user));
+      if (response && response.data) {
+        const { user, token } = response.data;
+        console.log("Response:", response);
+        setToken(token);
+        setCurrentUser(user);
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+      } else {
+        throw new Error("Invalid response from server");
+      }
     } catch (error) {
       console.error(error);
     }
@@ -61,7 +63,6 @@ export const AuthProvider = ({ children }) => {
       setToken(null);
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      setRole(null);
     } catch (error) {
       console.error(error);
     }
@@ -91,5 +92,3 @@ export const AuthProvider = ({ children }) => {
 AuthProvider.propTypes = {
   children: PropTypes.node,
 };
-
-export default AuthProvider;

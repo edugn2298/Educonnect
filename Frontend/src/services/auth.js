@@ -3,14 +3,13 @@ import { api } from "./api";
 export const createUser = async (req, res) => {
   const { username, email, password, role } = req.body;
   try {
-    const response = await api.post("/auth/register", {
+    const response = await api.post("/auth/user/register", {
       username,
       email,
       password,
       role,
     });
-    const { user, token } = response.data;
-    return { user, token };
+    return response;
   } catch (error) {
     if (error.response.status === 409) {
       res.status(409).send({ error: "Username or email already in use." });
@@ -22,20 +21,20 @@ export const createUser = async (req, res) => {
 
 export const login = async (emailOrUsername, password) => {
   try {
-    const response = await api.post("/auth/login", {
+    const response = await api.post("/auth/user/login", {
       emailOrUsername,
       password,
     });
-    const { user, token } = response.data;
-    return { user, token };
+    console.log("Response:", response);
+    return response;
   } catch (error) {
-    console.error(error);
+    return error;
   }
 };
 
 export const logout = async () => {
   try {
-    await api.post("/auth/logout");
+    await api.post("/auth/user/logout");
   } catch (error) {
     console.error("Error during logout", error);
     throw error;
