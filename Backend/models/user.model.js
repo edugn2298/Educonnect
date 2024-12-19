@@ -51,11 +51,12 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
     subscription: { type: mongoose.Schema.Types.ObjectId, ref: "Subscription" },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
     deleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
-
 /**
  * Model for user
  * @type {Model}

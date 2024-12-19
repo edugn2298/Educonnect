@@ -6,24 +6,29 @@ import { validateField } from "../../utils/validation";
 
 const formConfig = [
   {
-    name: "emailOrUsername",
-    label: "Email or Username",
-    type: "text",
+    name: "password",
+    label: "New Password",
+    type: "password",
+    validation: { required: true },
+  },
+  {
+    name: "confirmPassword",
+    label: "Confirm Password",
+    type: "password",
     validation: { required: true },
   },
 ];
 
-const buttons = [{ text: "Recuperar Contraseña", type: "submit" }];
+const buttons = [{ text: "Reset Password", type: "submit" }];
 
-const ForgotPassword = () => {
-  const { forgotPassword } = useAuth();
+const ResetPassword = () => {
+  const { resetPassword } = useAuth();
   const [formData, setFormData] = useState(
     formConfig.reduce((acc, field) => {
       acc[field.name] = "";
       return acc;
     }, {})
   );
-
   const [errors, setErrors] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -50,8 +55,7 @@ const ForgotPassword = () => {
       setErrors(newErrors);
     } else {
       try {
-        await forgotPassword(formData.emailOrUsername);
-        setErrorMessage("");
+        await resetPassword(formData);
       } catch (error) {
         console.error(error);
         setErrorMessage(error.message);
@@ -99,11 +103,11 @@ const ForgotPassword = () => {
           />
         ))}
         <Link
-          href="/login"
+          href="/forgot-password"
           underline="hover"
           className="mb-4 text-blue-500 hover:text-blue-700"
         >
-          <Typography variant="body2">Do yo want to login?</Typography>
+          <Typography variant="body2">Forgot Password?</Typography>
         </Link>
         <Button
           type="submit"
@@ -118,4 +122,5 @@ const ForgotPassword = () => {
     </div>
   );
 };
-export default ForgotPassword;
+
+export default ResetPassword;

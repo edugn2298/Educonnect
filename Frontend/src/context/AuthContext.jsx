@@ -4,6 +4,8 @@ import {
   login as loginApi,
   logout as logoutApi,
   createUser as registerApi,
+  forgetPassword as forgetPasswordApi,
+  resetPassword as resetPasswordApi,
 } from "../services/auth";
 
 export const AuthContext = createContext();
@@ -22,11 +24,14 @@ export const AuthProvider = ({ children }) => {
     }
     setLoading(false);
   }, []);
-
-  const register = async (username, email, password, role) => {
+  const register = async (formData) => {
     setLoading(true);
+    console.log("Form Data from AuthContext:", formData);
+    if (!formData.role) {
+      formData.role = "user";
+    }
     try {
-      const response = await registerApi(username, email, password, role);
+      const response = await registerApi(formData);
       const { user, token } = response.data;
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
@@ -34,6 +39,9 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(user);
     } catch (error) {
       console.error(error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -41,18 +49,19 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await loginApi(emailOrUsername, password);
+      console.log("Response:", response);
       if (response && response.data) {
         const { user, token } = response.data;
-        console.log("Response:", response);
         setToken(token);
         setCurrentUser(user);
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
-      } else {
-        throw new Error("Invalid response from server");
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,6 +77,22 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const forgotPassword = async (email) => {
+    try {
+      await forgetPasswordApi(email);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const resetPassword = async (token, newPassword) => {
+    try {
+      await resetPasswordApi(token, newPassword);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const value = {
     currentUser,
     setCurrentUser,
@@ -76,6 +101,8 @@ export const AuthProvider = ({ children }) => {
     register,
     login,
     logout,
+    forgotPassword,
+    resetPassword,
   };
 
   AuthContext.propTypes = {
