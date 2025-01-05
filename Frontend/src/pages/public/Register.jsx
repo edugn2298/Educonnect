@@ -1,6 +1,14 @@
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
-import { Box, TextField, Button, Link, Typography, Alert } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Link,
+  Typography,
+  Alert,
+  Snackbar,
+} from "@mui/material";
 import logo from "../../assets/logo.png";
 import { validateField } from "../../utils/validation";
 
@@ -20,7 +28,7 @@ const formConfig = [
     type: "text",
     validation: {
       required: true,
-      regex: /^[a-zA-Z0-9_]+$/,
+      regex: /^[a-zA-Z0-9_ ]+$/,
     },
   },
   {
@@ -88,6 +96,8 @@ const RegisterPage = () => {
   );
   const [errors, setErrors] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -97,6 +107,9 @@ const RegisterPage = () => {
     });
   };
 
+  const handleCloseAlert = () => {
+    setAlertOpen(false);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
@@ -113,16 +126,19 @@ const RegisterPage = () => {
     } else {
       try {
         console.log("formdata desde register", formData);
-        await register(formData);
-      } catch (error) {
-        console.error(error);
-        setErrorMessage(error.message);
+        const response = await register(formData);
+        setAlertMessage(response.data.message);
+        setAlertOpen(true);
         setFormData(
           formConfig.reduce((acc, field) => {
             acc[field.name] = "";
             return acc;
           }, {})
         );
+        console.log(response);
+      } catch (error) {
+        console.error(error);
+        setErrorMessage(error.message);
       }
     }
   };
@@ -186,6 +202,19 @@ const RegisterPage = () => {
           </Link>
         </Box>
       </Box>
+      <Snackbar
+        open={alertOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseAlert}
+      >
+        <Alert
+          onClose={handleCloseAlert}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

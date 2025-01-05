@@ -17,9 +17,10 @@ import userReport from "./routes/userreport.routes.js";
 import subscriptionReport from "./routes/subscriptionreport.routes.js";
 import postReport from "./routes/postreport.routes.js";
 import commentReport from "./routes/commentreport.routes.js";
+import { updateUser } from "./controllers/user.controller.js";
 
 const corsOptions = {
-  origin: ["http://localhost:3050", "http://localhost:5173"],
+  origin: ["http://localhost:3005", "http://localhost:5173"],
   methods: ["GET", "POST", "PATCH", "DELETE"],
   optionsSuccessStatus: 200,
 };
@@ -28,9 +29,11 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3050", "http://localhost:5173"],
+    origin: ["http://localhost:3005", "http://localhost:5173"],
     methods: ["GET", "POST", "PATCH", "DELETE"],
   },
+  pingInterval: 10000,
+  pingTimeout: 5000,
 });
 
 app.use(cors(corsOptions));

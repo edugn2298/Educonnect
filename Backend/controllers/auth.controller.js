@@ -11,6 +11,9 @@ config({ path: "./config/.env" });
  *@function createUser
  *@returns {Promise<void>}
  *@param {Object} req - The request object
+ *@param {string} req.body.fullname - The full name of the user
+ *@param {string} req.body.address - The address of the user
+ *@param {string} req.body.country - The country of the user
  *@param {string} req.body.username - The username of the user
  *@param {string} req.body.email - The email of the user
  *@param {string} req.body.password - The password of the user
@@ -21,8 +24,8 @@ config({ path: "./config/.env" });
  *@example http://localhost:3050/auth/user/register
  */
 export const createUser = async (req, res) => {
-  const { username, email, password, role } = req.body;
-  console.log(req.body);
+  const { fullname, address, country, username, email, password, role } =
+    req.body;
   try {
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
@@ -30,15 +33,22 @@ export const createUser = async (req, res) => {
         .status(409)
         .send({ error: "Username or email already in use." });
     }
-    const user = new User({ username, email, password, role });
+    const user = new User({
+      fullname,
+      address,
+      country,
+      username,
+      email,
+      password,
+      role,
+    });
     user.password = bcrypt.hashSync(user.password, 8);
     await user.save();
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-    res.status(201).send({ user, token });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    res
+      .status(201)
+      .send({ user, token, message: "User created successfully." });
   } catch (error) {
-    console.log(error);
     res.status(400).send(error);
   }
 };
@@ -66,7 +76,9 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-    res.status(200).send({ user, token });
+    res
+      .status(200)
+      .send({ user, token, message: "User logged in successfully." });
   } catch (error) {
     res.status(400).send({ error: "Invalid email or password" });
   }
@@ -82,7 +94,6 @@ export const loginUser = async (req, res) => {
  * @method POST
  * @example http://localhost:3050/user/logout
  */
-
 export const logOutUser = async (req, res) => {
   try {
     res.status(200).send({ message: "User logged out successfully." });
@@ -115,7 +126,7 @@ export const forgotPassword = async (req, res) => {
     }
 
     // Crear un token de restablecimiento de contraseña
-    const token = crypto.randomBytes(20).toString("hex");
+    const token = crypto.randomBytes(3).toString("hex").slice(0, 6);
 
     user.resetPasswordToken = token;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hora
@@ -131,9 +142,9 @@ export const forgotPassword = async (req, res) => {
       subject: "Password Reset",
       text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.
 
-      Please click on the following link, or paste this into your browser to complete the process:
+      Please enter the following token, or paste this into your password reset form to complete the process:
 
-      ${resetUrl}
+      ${token}
 
       If you did not request this, please ignore this email and your password will remain unchanged.
       `,
@@ -143,16 +154,22 @@ export const forgotPassword = async (req, res) => {
 
     res.status(200).send({ message: "Password reset email sent" });
   } catch (error) {
-    console.log(error);
     res.status(500).send({ error: "Internal Server Error" });
   }
 };
 
+/**
+ * @description Sends an email with a password reset token
+ * @param {Object} req - The request object
+ * @aprams {string} req.params.token - The password reset token
+ * @param {Object} res - The response object
+ * @returns {Promise<void>}
+ * @example http://localhost:3005/forgot-password/:token
+ */
 export const resetPassword = async (req, res) => {
   try {
     const user = await User.findOne({
       resetPasswordToken: req.params.token,
-      resetPasswordExpires: { $gt: Date.now() },
     });
 
     if (!user) {
@@ -161,7 +178,7 @@ export const resetPassword = async (req, res) => {
         .send({ error: "Password reset token is invalid or has expired" });
     }
 
-    user.password = bcrypt.hashSync(req.body.password, 8);
+    user.password = bcrypt.hashSync(req.body.newPassword.password, 8);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
 
@@ -169,7 +186,6 @@ export const resetPassword = async (req, res) => {
 
     res.status(200).send({ message: "Password has been reset" });
   } catch (error) {
-    console.log(error);
     res.status(500).send({ error: "Internal Server Error" });
   }
 };

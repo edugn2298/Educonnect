@@ -9,7 +9,6 @@ export const authenticate = async (req, res, next) => {
     const user = await User.findOne({
       _id: new mongoose.Types.ObjectId(decoded.id),
     });
-
     if (!user) {
       throw new Error("User not found");
     }

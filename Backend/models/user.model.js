@@ -17,10 +17,23 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
+    fullname: {
+      type: String,
+      required: [true, "Full name is required"],
+      validate: /^[a-zA-Z0-9 ]+$/,
+    },
+    address: {
+      type: String,
+      required: [true, "Address is required"],
+    },
+    country: {
+      type: String,
+      required: [true, "Country is required"],
+    },
     username: {
       type: String,
       required: [true, "Username is required"],
-      validate: /^[a-zA-Z0-9 ]+$/,
+      validate: /^[a-zA-Z0-9_ ]+$/,
       unique: true,
       minlength: [3, "Username must be at least 3 characters long"],
     },

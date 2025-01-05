@@ -10,12 +10,39 @@ import Chat from "../models/chat.model.js";
  * @returns {Object} - The created chat
  */
 export const createChat = async (req, res) => {
+  console.log(req.body.senderId, req.body.receiverId);
   const chat = await Chat.create({
-    users: [req.user._id, req.body.userId],
+    members: [req.body.senderId, req.body.receiverId],
   });
   try {
     const result = await chat.save();
     res.status(201).json(result);
+    console.log(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * get chat by id
+ * @async
+ * @requires - authenticate middleware
+ * @method GET
+ * @example http://localhost:3050/chats/:id
+ * @param {*} req - The request object
+ * @param {*} res  - The response object
+ */
+
+export const findChat = async (req, res) => {
+  console.log(req.params);
+  try {
+    const chat = await Chat.findOne({
+      members: { $all: [req.params.firstId, req.params.secondId] },
+    });
+    if (!chat) {
+      return res.status(404).json({ error: "Chat not found" });
+    }
+    res.json(chat);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -35,31 +62,20 @@ export const getChatsForUser = async (req, res) => {
     const chats = await Chat.find({
       members: { $in: [req.user._id] },
       deleted: false,
-    });
-    res.json(chats);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+    })
+      .populate({
+        path: "members",
+        select: "fullname profilePicture",
+        match: { _id: { $ne: req.user._id } },
+      })
+      .lean();
 
-/**
- * get chat by id
- * @async
- * @requires - authenticate middleware
- * @method GET
- * @example http://localhost:3050/chats/:id
- * @param {*} req - The request object
- * @param {*} res  - The response object
- */
-export const findChat = async (req, res) => {
-  try {
-    const chat = await Chat.findOne({
-      members: { $all: [req.firstId, req.secondId] },
+    const filteredChats = chats.map((chat) => {
+      chat.members = chat.members.filter((member) => member); // Filtrar miembros nulos
+      return chat;
     });
-    if (!chat) {
-      return res.status(404).json({ error: "Chat not found" });
-    }
-    res.json(chat);
+
+    res.json(filteredChats);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -83,7 +99,7 @@ export const deleteChat = async (req, res) => {
     if (!chat) {
       return res.status(404).json({ error: "Chat not found" });
     }
-    res.json(chat);
+    res.json({ message: "Chat deleted successfully", chat: chat });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

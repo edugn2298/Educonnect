@@ -22,23 +22,34 @@ routerChat.post("/", authenticate, authorize(["user", "admin"]), createChat);
  * @method GET
  * @description Get chat by id
  */
-routerChat.get("/:id", authenticate, authorize(["user", "admin"]), findChat);
 
-/**
- * @method PATCH
- * @description Delete chat by id
- */
-routerChat.patch("/:id", authenticate, authorize(["admin"]), deleteChat);
+routerChat.get(
+  "/find/:firstId/:secondId",
+  authenticate,
+  authorize(["user", "admin"]),
+  findChat
+);
 
 /**
  * @method GET
  * @description Get chat by id for user
  */
 routerChat.get(
-  "/user/:userId",
+  "/getchat/:userId/",
   authenticate,
   authorize(["user", "admin"]),
   getChatsForUser
+);
+
+/**
+ * @method PATCH
+ * @description Delete chat by id
+ */
+routerChat.patch(
+  "/delete/:id",
+  authenticate,
+  authorize(["user", "admin"]),
+  deleteChat
 );
 
 export default routerChat;

@@ -1,6 +1,15 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { Box, TextField, Button, Link, Typography, Alert } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Link,
+  Typography,
+  Alert,
+  Snackbar,
+} from "@mui/material";
 import logo from "../../assets/logo.png";
 import { validateField } from "../../utils/validation";
 
@@ -13,7 +22,7 @@ const formConfig = [
   },
 ];
 
-const buttons = [{ text: "Recuperar Contraseña", type: "submit" }];
+const buttons = [{ text: "Recover Password", type: "submit" }];
 
 const ForgotPassword = () => {
   const { forgotPassword } = useAuth();
@@ -26,6 +35,14 @@ const ForgotPassword = () => {
 
   const [errors, setErrors] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("success");
+  const navigate = useNavigate();
+
+  const handleCloseAlert = () => {
+    setAlertOpen(false);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -49,9 +66,17 @@ const ForgotPassword = () => {
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
     } else {
+      console.log(formData);
       try {
-        await forgotPassword(formData.emailOrUsername);
+        const response = await forgotPassword(formData.emailOrUsername);
+        console.log(response);
         setErrorMessage("");
+        setAlertMessage(response.data.message);
+        setAlertSeverity("success");
+        setAlertOpen(true);
+        setTimeout(() => {
+          navigate("/check-email");
+        }, 3000);
       } catch (error) {
         console.error(error);
         setErrorMessage(error.message);
@@ -103,7 +128,7 @@ const ForgotPassword = () => {
           underline="hover"
           className="mb-4 text-blue-500 hover:text-blue-700"
         >
-          <Typography variant="body2">Do yo want to login?</Typography>
+          <Typography variant="body2">Do you want to login?</Typography>
         </Link>
         <Button
           type="submit"
@@ -115,6 +140,20 @@ const ForgotPassword = () => {
           {buttons[0].text}
         </Button>
       </Box>
+
+      <Snackbar
+        open={alertOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseAlert}
+      >
+        <Alert
+          onClose={handleCloseAlert}
+          severity={alertSeverity}
+          sx={{ width: "100%" }}
+        >
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

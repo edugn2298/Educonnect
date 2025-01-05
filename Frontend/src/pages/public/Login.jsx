@@ -1,6 +1,15 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { Box, TextField, Button, Link, Typography, Alert } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Link,
+  Typography,
+  Alert,
+  Snackbar,
+} from "@mui/material";
 import logo from "../../assets/logo.png";
 import { validateField } from "../../utils/validation";
 
@@ -19,7 +28,7 @@ const formConfig = [
   },
 ];
 
-const buttons = [{ text: "Iniciar Sesión", type: "submit" }];
+const buttons = [{ text: "Login", type: "submit" }];
 
 const LoginPage = () => {
   const { login } = useAuth();
@@ -31,6 +40,14 @@ const LoginPage = () => {
   );
   const [errors, setErrors] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("success");
+  const navigate = useNavigate();
+
+  const handleCloseAlert = () => {
+    setAlertOpen(false);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,7 +72,17 @@ const LoginPage = () => {
       setErrors(newErrors);
     } else {
       try {
-        await login(formData.emailOrUsername, formData.password);
+        const response = await login(
+          formData.emailOrUsername,
+          formData.password
+        );
+        console.log(response);
+        setAlertMessage(response.data.message);
+        setAlertSeverity("success");
+        setAlertOpen(true);
+        setTimeout(() => {
+          navigate("/feed");
+        }, 3000);
       } catch (error) {
         console.error(error);
         setErrorMessage("Invalid username or password");
@@ -131,10 +158,23 @@ const LoginPage = () => {
             underline="hover"
             className="text-blue-500 hover:text-blue-700"
           >
-            <Typography variant="body2">Don&apost have an account?</Typography>
+            <Typography variant="body2">Don&apos;t have an account?</Typography>
           </Link>
         </Box>
       </Box>
+      <Snackbar
+        open={alertOpen}
+        onClose={handleCloseAlert}
+        autoHideDuration={3000}
+      >
+        <Alert
+          onClose={handleCloseAlert}
+          severity={alertSeverity}
+          sx={{ width: "100%" }}
+        >
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

@@ -6,7 +6,7 @@ import {
   getPostById,
   updatePost,
   deletePost,
-  prueba,
+  feedPosts,
 } from "../controllers/post.controller.js";
 import uploadImage from "../middlewares/uploadImage.js";
 
@@ -26,7 +26,7 @@ routerPost.get("/", authenticate, authorize(["admin"]), getAllPosts);
  * @description Get post by id
  */
 routerPost.get(
-  "/postbyid/:id",
+  "/postbyid",
   authenticate,
   authorize(["user", "admin"]),
   getPostById
@@ -40,6 +40,7 @@ routerPost.patch(
   "/update/:id",
   authenticate,
   authorize(["user", "admin"]),
+  uploadImage.single("image"),
   updatePost
 );
 
@@ -65,5 +66,11 @@ routerPost.post(
   uploadImage.single("image"),
   createPost
 );
+
+/**
+ * @method GET
+ * @description Get feed posts
+ */
+routerPost.get("/feed", authenticate, authorize(["user", "admin"]), feedPosts);
 
 export default routerPost;

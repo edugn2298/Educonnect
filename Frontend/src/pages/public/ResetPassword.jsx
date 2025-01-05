@@ -1,6 +1,15 @@
 import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { Box, TextField, Button, Link, Typography, Alert } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Link,
+  Typography,
+  Alert,
+  Snackbar,
+} from "@mui/material";
 import logo from "../../assets/logo.png";
 import { validateField } from "../../utils/validation";
 
@@ -23,6 +32,7 @@ const buttons = [{ text: "Reset Password", type: "submit" }];
 
 const ResetPassword = () => {
   const { resetPassword } = useAuth();
+  const { token } = useParams();
   const [formData, setFormData] = useState(
     formConfig.reduce((acc, field) => {
       acc[field.name] = "";
@@ -31,6 +41,14 @@ const ResetPassword = () => {
   );
   const [errors, setErrors] = useState({});
   const [errorMessage, setErrorMessage] = useState("");
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("success");
+  const navigate = useNavigate();
+
+  const handleCloseAlert = () => {
+    setAlertOpen(false);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,7 +73,13 @@ const ResetPassword = () => {
       setErrors(newErrors);
     } else {
       try {
-        await resetPassword(formData);
+        const response = await resetPassword(token, formData);
+        setAlertMessage(response.data.message);
+        setAlertSeverity("success");
+        setAlertOpen(true);
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
       } catch (error) {
         console.error(error);
         setErrorMessage(error.message);
@@ -119,6 +143,19 @@ const ResetPassword = () => {
           {buttons[0].text}
         </Button>
       </Box>
+      <Snackbar
+        open={alertOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseAlert}
+      >
+        <Alert
+          onClose={handleCloseAlert}
+          severity={alertSeverity}
+          sx={{ width: "100%" }}
+        >
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

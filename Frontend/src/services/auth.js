@@ -1,4 +1,4 @@
-import { api } from "./api";
+import { api, authApi } from "./api";
 
 export const createUser = async (formData) => {
   console.log("Desde Auth.js", formData);
@@ -21,6 +21,7 @@ export const login = async (emailOrUsername, password) => {
       emailOrUsername,
       password,
     });
+    console.log(response);
     return response;
   } catch (error) {
     throw error.response.data;
@@ -29,7 +30,8 @@ export const login = async (emailOrUsername, password) => {
 
 export const logout = async () => {
   try {
-    await api.post("/auth/user/logout");
+    const response = await authApi.post("/auth/user/logout");
+    return response;
   } catch (error) {
     console.error("Error during logout", error);
     throw error.response.data;
@@ -37,8 +39,10 @@ export const logout = async () => {
 };
 
 export const forgetPassword = async (email) => {
+  console.log("Desde Auth.js", "Email:", email);
   try {
     const response = await api.post("/auth/user/forgot-password", { email });
+    console.log(response);
     return response;
   } catch (error) {
     throw error.response.data;
@@ -46,10 +50,81 @@ export const forgetPassword = async (email) => {
 };
 
 export const resetPassword = async (token, newPassword) => {
+  console.log("Desde Auth.js", "Token:", token, "New Password:", newPassword);
   try {
-    const response = await api.post("/auth/user/reset-password/${token}", {
+    const response = await api.post(`/auth/user/reset-password/${token}`, {
       newPassword,
     });
+    console.log("Response from Auth.js:", response);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getUser = async (id) => {
+  try {
+    const response = await authApi.get(`/users/profile/${id}`);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const updateUser = async (id, formData) => {
+  try {
+    console.log("Desde Auth.js", "ID:", id, "Form Data:", formData);
+    const response = await authApi.patch(`/users/update/${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getFollowers = async (id) => {
+  try {
+    const response = await authApi.get(`/users/followers/${id}`);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getFollowing = async (id) => {
+  try {
+    const response = await authApi.get(`/users/following/${id}`);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const followUser = async (userId, id) => {
+  console.log("Desde Auth.js", "User ID:", userId, "ID:", id);
+  try {
+    const response = await authApi.patch(`/users/follow/${id}`, { userId });
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const unfollowUser = async (userId, id) => {
+  try {
+    const response = await authApi.patch(`/users/unfollow/${id}`, { userId });
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const searchUsers = async (query) => {
+  try {
+    const response = await authApi.get(`/users/search?q=${query}`);
     return response;
   } catch (error) {
     throw error.response.data;
