@@ -9,7 +9,6 @@ import mongoosePaginate from "mongoose-paginate-v2";
  * @requires mongoose
  * @requires mongoose.Schema
  * @property {string} sender - The sender of the message.
- * @property {string} receiver - The receiver of the message.
  * @property {string} content - The content of the message.
  * @property {string} createdAt - The created at of the message.
  * @property {string} read - The read status of the message.

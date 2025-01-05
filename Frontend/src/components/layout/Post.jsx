@@ -13,8 +13,6 @@ import CommentIcon from "@mui/icons-material/Comment";
 import PropTypes from "prop-types";
 
 const Post = ({ posts, lastPostElementRef }) => {
-  console.log(posts);
-
   const cardStyle = {
     width: "100%", // Asegurar que el ancho del Card sea el mismo para todos los posts
     maxWidth: "600px", // Define un ancho máximo uniforme

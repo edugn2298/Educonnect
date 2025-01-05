@@ -1,4 +1,4 @@
-/*import { io } from "socket.io-client";
+import { io } from "socket.io-client";
 
 const SOCKET_URL = "http://localhost:3005";
 
@@ -23,4 +23,4 @@ socket.on("disconnect", (reason) => {
   }
 });
 
-export default socket;*/
+export default socket;

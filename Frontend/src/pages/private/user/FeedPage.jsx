@@ -22,7 +22,6 @@ const FeedPage = () => {
   const LoadMorePost = useCallback(async () => {
     setLoading(true);
     const newPosts = await feedPosts(currentUser._id, page);
-    console.log(newPosts);
     if (newPosts.data.posts.length === 0) {
       hasMore.current = false;
     } else {

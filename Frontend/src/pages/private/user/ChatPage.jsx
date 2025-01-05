@@ -22,6 +22,7 @@ import {
   deleteChat,
 } from "../../../services/ChatRequest";
 import { sendMessage, getMessages } from "../../../services/MessageRequest";
+import socket from "../../../services/webSocket";
 
 const ChatPage = () => {
   const { currentUser } = useAuth();
@@ -30,6 +31,16 @@ const ChatPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedChat, setSelectedChat] = useState(null);
   const [newMessage, setNewMessage] = useState(""); // Estado para almacenar el nuevo mensaje
+
+  useEffect(() => {
+    socket.on("chat message", (msg) => {
+      console.log("Mensaje recibido:", msg);
+      setMessages((prevMessages) => [...prevMessages, msg]);
+    });
+    return () => {
+      socket.off("chat message");
+    };
+  }, []);
 
   const userChats = async () => {
     try {
@@ -59,13 +70,17 @@ const ChatPage = () => {
     };
     const formResponse = new FormData();
     formResponse.append("chatId", selectedChat._id);
-    formResponse.append("senderId", currentUser._id);
+    formResponse.append("sender", currentUser._id);
     formResponse.append("content", message);
     console.log(formResponse.entries());
     console.log(formData);
     try {
       const response = await sendMessage(formData);
       console.log(response);
+      socket.emit("chat message", {
+        ...response.data,
+        chatId: selectedChat._id,
+      });
       setMessages([...messages, response.data]); // Actualizar los mensajes con el nuevo mensaje
       setNewMessage(""); // Limpiar el TextField
     } catch (error) {
@@ -75,8 +90,9 @@ const ChatPage = () => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    console.log(newMessage);
-    sendMessageToChat(newMessage);
+    if (newMessage.trim() !== "") {
+      sendMessageToChat(newMessage);
+    }
   };
 
   useEffect(() => {
@@ -95,11 +111,30 @@ const ChatPage = () => {
 
   const handleChatSelect = (chat) => {
     console.log(chat);
+    socket.emit("join chat", chat._id);
     setSelectedChat(chat);
   };
 
   const handleNewMessageChange = (e) => {
     setNewMessage(e.target.value); // Actualizar el valor del TextField
+  };
+
+  const getSenderName = (message) => {
+    if (message.sender === currentUser._id) {
+      return currentUser.fullname; // Nombre del usuario actual
+    } else {
+      const sender = selectedChat.members.find(
+        (member) => member._id === message.sender
+      );
+      return sender ? sender.fullname : "Desconocido"; // Nombre del remitente, o "Desconocido" si no se encuentra
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage(e);
+    }
   };
 
   return (
@@ -179,12 +214,16 @@ const ChatPage = () => {
                     {selectedChat.members[0].fullname}
                   </Typography>
                 </Box>
-                <Box flexGrow={1} p={2} sx={{ overflowY: "auto" }}>
+                <Box
+                  flexGrow={1}
+                  p={2}
+                  sx={{ overflowY: "auto", height: "70vh" }}
+                >
                   {/* Mostrar mensajes del chat */}
                   {messages.map((message) => (
                     <Box key={message._id} sx={{ mb: 2 }}>
                       <Typography variant="body1">
-                        {selectedChat.members[0].fullname}: {message.content}
+                        {getSenderName(message)}: {message.content}
                       </Typography>
                     </Box>
                   ))}
@@ -202,6 +241,7 @@ const ChatPage = () => {
                     variant="outlined"
                     value={newMessage}
                     onChange={handleNewMessageChange}
+                    onKeyDown={handleKeyPress} // Detectar la tecla Enter
                     sx={{ mr: 2 }}
                   />
                   <IconButton color="primary" onClick={handleSendMessage}>

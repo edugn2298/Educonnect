@@ -71,6 +71,16 @@ app.use("/commentreport", commentReport);
 //Conection with socket.io
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
+
+  socket.on("join chat", (chatId) => {
+    socket.join(chatId);
+    console.log(`User ${socket.id} joined chat: ${chatId}`);
+  });
+
+  socket.on("chat message", (msg) => {
+    io.to(msg.chatId).emit("chat message", msg);
+  });
+
   socket.on("disconnect", () => {
     console.log(`User disconnected: ${socket.id}`);
   });
