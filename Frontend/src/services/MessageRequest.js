@@ -18,3 +18,13 @@ export const getMessages = async (id) => {
     throw error.response.data;
   }
 };
+
+export const getFilteredMessages = async (filter) => {
+  try {
+    const params = new URLSearchParams(filter).toString();
+    const response = await authApi.get("/messagereport", params);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

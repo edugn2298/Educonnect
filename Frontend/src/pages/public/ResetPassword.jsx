@@ -94,20 +94,44 @@ const ResetPassword = () => {
   };
 
   return (
-    <div
-      className="
-        w-screen h-screen flex justify-center items-center bg-gradient-to-r from-indigo-400 to-cyan-400 dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-700
-      "
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+        background: (theme) =>
+          theme.palette.mode === "dark"
+            ? "linear-gradient(to right, #2e3b55, #243b4d)"
+            : "linear-gradient(to right, #4b6cb7, #182848)",
+      }}
     >
       <Box
-        className="
-          flex flex-col items-center gap-4 rounded-md p-8 border border-gray-300 bg-gray-100
-          w-11/12 sm:w-5/6 md:w-4/5 lg:w-3/5 xl:w-2/5 2xl:w-1/3
-        "
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 2,
+          p: 4,
+          borderRadius: 2,
+          boxShadow: 3,
+          backgroundColor: (theme) => theme.palette.background.paper,
+          maxWidth: {
+            xs: "90%", // max width for extra small screens
+            sm: "80%", // max width for small screens
+            md: "70%", // max width for medium screens
+            lg: "60%", // max width for large screens
+            xl: "50%", // max width for extra large screens
+          },
+        }}
       >
-        <img src={logo} alt="logo" className="w-40 mb-6" />
+        <img
+          src={logo}
+          alt="logo"
+          style={{ width: "160px", marginBottom: "24px" }}
+        />
         {errorMessage && (
-          <Alert severity="error" className="w-full mb-4">
+          <Alert severity="error" sx={{ width: "100%", mb: 2 }}>
             {errorMessage}
           </Alert>
         )}
@@ -123,13 +147,13 @@ const ResetPassword = () => {
             onChange={handleChange}
             error={Boolean(errors[field.name])}
             helperText={errors[field.name]}
-            className="mb-4"
+            sx={{ mb: 2 }}
           />
         ))}
         <Link
           href="/forgot-password"
           underline="hover"
-          className="mb-4 text-blue-500 hover:text-blue-700"
+          sx={{ mb: 2, color: "primary.main" }}
         >
           <Typography variant="body2">Forgot Password?</Typography>
         </Link>
@@ -138,7 +162,7 @@ const ResetPassword = () => {
           variant="contained"
           fullWidth
           onClick={handleSubmit}
-          className="mb-4 bg-form-bgButtonPrimary !text-form-textWhite hover:bg-form-bgButtonPrimaryHover"
+          sx={{ mb: 2 }}
         >
           {buttons[0].text}
         </Button>
@@ -156,7 +180,7 @@ const ResetPassword = () => {
           {alertMessage}
         </Alert>
       </Snackbar>
-    </div>
+    </Box>
   );
 };
 

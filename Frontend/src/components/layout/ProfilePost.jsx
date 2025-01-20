@@ -1,108 +1,197 @@
 import {
   Box,
-  Grid,
   Typography,
   Card,
   CardContent,
-  IconButton,
   CardMedia,
+  Avatar,
+  IconButton,
+  Divider,
+  Button,
+  Grid,
+  TextField,
 } from "@mui/material";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import CommentIcon from "@mui/icons-material/Comment";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SendIcon from "@mui/icons-material/Send";
 import PropTypes from "prop-types";
+import { useTheme } from "@mui/material/styles";
+import { useAuth } from "../../context/AuthContext";
+import { useState } from "react";
 
 const ProfilePost = ({ posts, onSave, onDelete }) => {
+  const theme = useTheme();
+  const { currentUser } = useAuth();
+  const [comments, setComments] = useState({});
+
+  const handleCommentChange = (e, postId) => {
+    setComments({
+      ...comments,
+      [postId]: e.target.value,
+    });
+  };
+
+  const handleCommentSubmit = (postId) => {
+    setComments({
+      ...comments,
+      [postId]: "",
+    });
+  };
+
   return (
-    <Box sx={{ padding: 2 }}>
-      <Grid container spacing={3}>
-        {posts.map((post, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Card
+    <Grid container spacing={3}>
+      {posts.map((post) => (
+        <Grid item xs={12} sm={6} lg={4} key={post._id}>
+          <Card
+            sx={{
+              width: "100%",
+              maxWidth: "600px",
+              margin: "0 auto",
+              boxShadow: 3,
+              borderRadius: "16px",
+              bgcolor: theme.palette.background.paper,
+              overflow: "hidden",
+            }}
+          >
+            <CardContent
               sx={{
-                boxShadow: 4,
-                borderRadius: 2,
-                overflow: "hidden",
-                position: "relative",
                 display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                padding: post.media && post.media.length > 0 ? "0" : "16px",
-                backgroundColor:
-                  post.media && post.media.length > 0 ? "white" : "#f5f5f5",
+                alignItems: "center",
+                padding: "10px 16px",
               }}
             >
-              {post.media && post.media.length > 0 && (
-                <Box>
-                  {post.media.map((media, idx) => (
-                    <CardMedia
-                      key={idx}
-                      component="img"
-                      height="200"
-                      image={media}
-                      alt="post image"
-                      sx={{ objectFit: "cover" }}
-                    />
-                  ))}
-                </Box>
-              )}
-              <CardContent>
-                <Typography variant="h6" color="text.primary" sx={{ mb: 1 }}>
+              <Avatar
+                src={post.author.profilePicture}
+                alt={`${post.author.username}'s profile picture`}
+                sx={{ width: 40, height: 40, marginRight: 2 }}
+              />
+              <Box>
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: "bold", color: theme.palette.text.primary }}
+                >
                   {post.author.username}
                 </Typography>
                 <Typography
                   variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 2 }}
+                  sx={{ color: theme.palette.text.secondary }}
                 >
-                  {post.content}
+                  @{post.author.username} ·{" "}
+                  {new Date(post.createdAt).toLocaleString()}
                 </Typography>
-              </CardContent>
-              <CardContent
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  borderTop:
-                    post.media && post.media.length > 0
-                      ? "1px solid #e0e0e0"
-                      : "none",
-                  padding: "8px 16px",
-                }}
+              </Box>
+            </CardContent>
+            <Divider />
+            {post.media.length > 0 && (
+              <CardMedia
+                component="img"
+                height="400"
+                image={post.media[0]}
+                alt="post image"
+                sx={{ borderRadius: "16px 16px 0 0", maxHeight: 300 }}
+              />
+            )}
+            <CardContent>
+              <Typography
+                variant="body2"
+                sx={{ marginTop: 1, color: theme.palette.text.secondary }}
               >
+                {post.content}
+              </Typography>
+            </CardContent>
+            <Divider />
+            <CardContent
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center" }}>
                 <IconButton
-                  aria-label="edit"
-                  onClick={() => onSave(post)}
-                  sx={{ color: "primary.main" }}
+                  aria-label="add to favorites"
+                  sx={{ color: theme.palette.error.main }}
                 >
-                  <EditIcon />
+                  <FavoriteIcon />
                 </IconButton>
+                <Typography
+                  variant="body2"
+                  sx={{ color: theme.palette.text.secondary }}
+                >
+                  {post.likes} likes
+                </Typography>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
                 <IconButton
-                  aria-label="delete"
-                  onClick={() => onDelete(post._id)}
-                  sx={{ color: "error.main" }}
+                  aria-label="comment"
+                  sx={{ color: theme.palette.primary.main }}
                 >
-                  <DeleteIcon />
+                  <CommentIcon />
                 </IconButton>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+                <Typography
+                  variant="body2"
+                  sx={{ color: theme.palette.text.secondary }}
+                >
+                  {post.comments.length} comments
+                </Typography>
+              </Box>
+            </CardContent>
+            {currentUser._id === post.author._id && (
+              <>
+                <Divider />
+                <CardContent
+                  sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}
+                >
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<EditIcon />}
+                    onClick={() => onSave(post)}
+                    sx={{ textTransform: "none", fontWeight: "bold" }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    startIcon={<DeleteIcon />}
+                    onClick={() => onDelete(post._id)}
+                    sx={{ textTransform: "none", fontWeight: "bold" }}
+                  >
+                    Delete
+                  </Button>
+                </CardContent>
+              </>
+            )}
+            <Divider />
+            <CardContent sx={{ display: "flex", alignItems: "center" }}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Write a comment..."
+                value={comments[post._id] || ""}
+                onChange={(e) => handleCommentChange(e, post._id)}
+                sx={{ bgcolor: theme.palette.background.paper }}
+              />
+              <IconButton
+                color="primary"
+                aria-label="send"
+                onClick={() => handleCommentSubmit(post._id)}
+              >
+                <SendIcon />
+              </IconButton>
+            </CardContent>
+          </Card>
+        </Grid>
+      ))}
+    </Grid>
   );
 };
 
 ProfilePost.propTypes = {
-  posts: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      author: PropTypes.shape({
-        username: PropTypes.string.isRequired,
-      }).isRequired,
-      media: PropTypes.arrayOf(PropTypes.string), // Definir media como array de strings
-      content: PropTypes.string.isRequired,
-    })
-  ).isRequired,
+  posts: PropTypes.arrayOf(PropTypes.object).isRequired,
   onSave: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 };

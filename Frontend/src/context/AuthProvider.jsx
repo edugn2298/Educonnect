@@ -29,46 +29,6 @@ export const AuthProvider = ({ children }) => {
     setInitialLoading(false);
   }, []);
 
-  /* const fetchUserDetails = useCallback(async () => {
-    if (currentUser && currentUser._id) {
-      try {
-        const response = await getUser(currentUser._id);
-        if (response) {
-          setCurrentUser(response.data);
-          setError(null); // Clear any previous error
-        }
-      } catch (error) {
-        console.error("Error fetching user details:", error);
-        setError("Failed to fetch user details.");
-      }
-    }
-  }, [currentUser]);
-
-    useEffect(() => {
-    if (currentUser) {
-      fetchUserDetails();
-
-      const interval = setInterval(fetchUserDetails, 30000);
-
-      socket.on("connect", () => {
-        console.log("Connected to WebSocket server");
-      });
-
-      socket.on("userUpdated", (updatedUser) => {
-        if (updatedUser._id === currentUser._id) {
-          setCurrentUser(updatedUser);
-          localStorage.setItem("user", JSON.stringify(updatedUser));
-        }
-      });
-
-      return () => {
-        clearInterval(interval);
-        socket.off("userUpdated");
-        socket.disconnect();
-      };
-    }
-  }, [currentUser, fetchUserDetails]);*/
-
   const register = async (formData) => {
     setLoading(true);
     setError(null);
@@ -80,12 +40,10 @@ export const AuthProvider = ({ children }) => {
       const { user, token } = response.data;
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("welcomeShow", "false");
       setCurrentUser(user);
-
+      navigate("/welcome");
       setAlertMessage("Registration successful!");
       setAlertOpen(true);
-      navigate("/welcome");
       return response;
     } catch (error) {
       console.error("Error during registration:", error);
@@ -104,11 +62,11 @@ export const AuthProvider = ({ children }) => {
       console.log("Response from AuthProvider:", response);
       if (response && response.data) {
         const { user, token } = response.data;
+        console.log("User from AuthProvider:", user);
         setCurrentUser(user);
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("welcomeShow", "true");
-        localStorage.setItem("isFirstLogin", "true");
+        navigate("/feed");
       }
       return response;
     } catch (error) {

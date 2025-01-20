@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import mongoosePaginate from "mongoose-paginate-v2";
 
 /**
  * Schema for user
@@ -51,6 +52,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    subscription: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subscription",
+      default: null,
+    },
     bio: {
       type: String,
       maxlength: [150, "Bio must be less than 150 characters"],
@@ -63,13 +69,18 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    subscription: { type: mongoose.Schema.Types.ObjectId, ref: "Subscription" },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
     deleted: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
+
+/**
+ * Plugin for pagination
+ */
+userSchema.plugin(mongoosePaginate);
+
 /**
  * Model for user
  * @type {Model}

@@ -1,5 +1,12 @@
 import { api, authApi } from "./api";
 
+/**
+ * Creates a new user
+ * @function createUser
+ * @param {Object} formData - The user data to be registered
+ * @returns {Promise<Object>} - The response from the server
+ * @throws {Error} - If there is an error when creating the user
+ */
 export const createUser = async (formData) => {
   console.log("Desde Auth.js", formData);
   try {
@@ -125,6 +132,25 @@ export const unfollowUser = async (userId, id) => {
 export const searchUsers = async (query) => {
   try {
     const response = await authApi.get(`/users/search?q=${query}`);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const searchFollowing = async (id, query) => {
+  try {
+    const response = await authApi.get(`/users/sf/${id}?q=${query}`);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getFilteredUsers = async (filters) => {
+  try {
+    const params = new URLSearchParams(filters).toString();
+    const response = await authApi.get(`/userreport?${params}`);
     return response;
   } catch (error) {
     throw error.response.data;

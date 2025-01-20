@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useParams, Link } from "react-router-dom";
 import Sidebar from "../../../components/layout/Sidebar";
 import ProfileCard from "../../../components/layout/ProfileCard";
 import ProfilePost from "../../../components/layout/ProfilePost";
@@ -13,7 +14,8 @@ import {
 import { getUser } from "../../../services/auth";
 
 export const ProfilePage = () => {
-  const { currentUser, setCurrentUser } = useAuth();
+  const { currentUser, setCurrentUser, Logout } = useAuth();
+  const { userId } = useParams(); // Obtén el ID del usuario desde la URL
   const [userDetails, setUserDetails] = useState(null);
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,19 +32,21 @@ export const ProfilePage = () => {
 
   const fetchUserDetails = useCallback(async () => {
     try {
-      const response = await getUser(currentUser._id);
+      const response = await getUser(userId || currentUser._id);
       console.log(currentUser);
       setUserDetails(response.data);
-      setCurrentUser(response.data);
+      if (userId === currentUser._id) {
+        setCurrentUser(response.data);
+      }
     } catch (error) {
       setUserDetailsError(error);
     }
-  }, [currentUser, setCurrentUser]);
+  }, [userId, currentUser, setCurrentUser]);
 
   const fetchPosts = useCallback(
     async (page = 1) => {
       try {
-        const response = await getPosts(currentUser._id, page);
+        const response = await getPosts(userId || currentUser._id, page);
         setPosts(response.data.posts);
         setTotalPages(response.data.totalPages);
       } catch (error) {
@@ -51,17 +55,17 @@ export const ProfilePage = () => {
         setLoading(false);
       }
     },
-    [currentUser._id]
+    [userId, currentUser._id]
   );
 
   useEffect(() => {
-    if (!hasFetchedUserDetails.current && currentUser) {
-      setLoading(true);
+    setLoading(true);
+    if (!hasFetchedUserDetails.current) {
       fetchUserDetails();
-      fetchPosts(currentPage);
       hasFetchedUserDetails.current = true;
     }
-  }, [currentUser, fetchUserDetails, fetchPosts, currentPage]);
+    fetchPosts(currentPage);
+  }, [userId, currentPage, fetchUserDetails, fetchPosts]);
 
   const handleDeletePost = async (postId) => {
     try {
@@ -83,8 +87,6 @@ export const ProfilePage = () => {
       const response = await updatePost(postId, formData);
       if (response.ok) {
         fetchPosts(currentPage);
-        /*setSnackbarMessage("Post editado con éxito!");
-        setSnackbarSeverity("success");*/
       }
     } catch (error) {
       setPostsError(error);
@@ -93,6 +95,10 @@ export const ProfilePage = () => {
     } finally {
       setSnackbarOpen(true);
     }
+  };
+
+  const handleCommentPost = async (postId, comment) => {
+    // Funcionalidad no implementada
   };
 
   const handlePageChange = (newPage) => {
@@ -118,10 +124,19 @@ export const ProfilePage = () => {
     setSelectedPost(null);
   };
 
+  const isCurrentUser = userDetails && userDetails._id === currentUser._id;
+
   return (
     <Box
-      sx={{ width: "100vw", minHeight: "100vh", display: "flex" }}
-      className="bg-gradient-to-r from-indigo-400 to-cyan-400 dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-700"
+      sx={{
+        width: "100vw",
+        minHeight: "100vh",
+        display: "flex",
+        background: (theme) =>
+          theme.palette.mode === "dark"
+            ? "linear-gradient(to right, #2e3b55, #243b4d)"
+            : "linear-gradient(to right, #4b6cb7, #182848)",
+      }}
     >
       <Sidebar />
       <Box
@@ -145,11 +160,12 @@ export const ProfilePage = () => {
             Error: {postsError.message || "Error fetching posts"}
           </Typography>
         )}
-        {posts.length > 0 ? (
+        {posts && posts.length > 0 ? (
           <ProfilePost
             posts={posts}
             onSave={handleEditClick}
             onDelete={handleDeletePost}
+            onComment={handleCommentPost}
           />
         ) : (
           !loading &&
@@ -176,14 +192,24 @@ export const ProfilePage = () => {
             Next
           </Button>
         </Box>
-        <Box display="flex" justifyContent="flex-end" m={4} sx={{ gap: 1 }}>
-          <Button variant="contained" color="primary">
-            Change Password
-          </Button>
-          <Button variant="contained" color="primary">
-            Log Out
-          </Button>
-        </Box>
+        {isCurrentUser && (
+          <Box display="flex" justifyContent="flex-end" m={4} sx={{ gap: 1 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              component={Link}
+              to={`/edit-profile/${currentUser._id}`}
+            >
+              Edit Profile
+            </Button>
+            <Button variant="contained" color="primary">
+              Change Password
+            </Button>
+            <Button variant="contained" color="primary" onClick={Logout}>
+              Log Out
+            </Button>
+          </Box>
+        )}
         <Snackbar
           open={snackbarOpen}
           autoHideDuration={6000}

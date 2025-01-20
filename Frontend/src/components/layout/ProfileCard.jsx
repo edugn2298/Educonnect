@@ -1,81 +1,144 @@
 import { useLocation } from "react-router-dom";
-import { Box, Avatar, Typography, Button, Divider } from "@mui/material";
+import {
+  Box,
+  Avatar,
+  Typography,
+  Button,
+  Divider,
+  Paper,
+  IconButton,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import { Share } from "@mui/icons-material";
 import PropTypes from "prop-types";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
+import { useAuth } from "../../context/AuthContext";
 
 const ProfileCard = ({ user }) => {
   const location = useLocation();
+  const theme = useTheme();
+  const { currentUser } = useAuth();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
+  const handleShare = () => {
+    const userProfileLink = `${window.location.origin}/profile/${user._id}`;
+    navigator.clipboard.writeText(userProfileLink);
+    setSnackbarMessage("Link copiado al portapapeles");
+    setSnackbarOpen(true);
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
   return (
-    <Box className="flex flex-col md:flex-row justify-between items-center p-6 shadow-lg rounded-lg bg-white dark:bg-gray-800 mb-6">
+    <Paper
+      elevation={3}
+      sx={{
+        display: "flex",
+        flexDirection: { xs: "column", lg: "row" },
+        justifyContent: "space-between",
+        alignItems: "center",
+        p: 4,
+        borderRadius: 2,
+        bgcolor: "background.default",
+        mb: 6,
+        width: "100%",
+      }}
+    >
       {/* Parte Izquierda */}
-      <Box className="flex flex-col items-center mb-4 md:mb-0">
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          mb: { xs: 4, lg: 0 },
+        }}
+      >
         <Avatar
           src={user.profilePicture}
           alt={user.name}
-          className="w-24 h-24"
+          sx={{ width: 96, height: 96 }}
         />
         <Typography
           variant="h6"
-          className="mt-2 text-center text-black dark:text-white"
+          sx={{ mt: 2, textAlign: "center", color: theme.palette.text.primary }}
         >
           {user.username}
         </Typography>
         <Typography
           variant="body2"
-          color="textSecondary"
-          className="mt-1 text-center text-black dark:text-white"
+          sx={{
+            mt: 1,
+            textAlign: "center",
+            color: theme.palette.text.secondary,
+          }}
         >
           {user.fullname}
         </Typography>
       </Box>
 
       {/* Parte Central */}
-      <Box className="flex flex-col items-center mb-4 md:mb-0">
-        <Box className="flex items-center">
-          <Box className="flex flex-col items-center mx-4">
-            <Typography variant="h6" className="text-black dark:text-white">
-              {user.posts.length}
+      <Box
+        sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              mx: 4,
+            }}
+          >
+            <Typography variant="h6" sx={{ color: theme.palette.text.primary }}>
+              {user.posts ? user.posts.length : 0}
             </Typography>
             <Typography
               variant="body2"
-              color="textSecondary"
-              className="text-black dark:text-white"
+              sx={{ color: theme.palette.text.secondary }}
             >
               Posts
             </Typography>
           </Box>
-          <Divider
-            orientation="vertical"
-            flexItem
-            className="h-16 mx-2 dark:bg-gray-700"
-          />
-          <Box className="flex flex-col items-center mx-4">
-            <Typography variant="h6" className="text-black dark:text-white">
-              {user.followers.length}
+          <Divider orientation="vertical" flexItem sx={{ height: 64, mx: 2 }} />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              mx: 4,
+            }}
+          >
+            <Typography variant="h6" sx={{ color: theme.palette.text.primary }}>
+              {user.followers ? user.followers.length : 0}
             </Typography>
             <Typography
               variant="body2"
-              color="textSecondary"
-              className="text-black dark:text-white"
+              sx={{ color: theme.palette.text.secondary }}
             >
               Followers
             </Typography>
           </Box>
-          <Divider
-            orientation="vertical"
-            flexItem
-            className="h-16 mx-2 dark:bg-gray-700"
-          />
-          <Box className="flex flex-col items-center mx-4">
-            <Typography variant="h6" className="text-black dark:text-white">
-              {user.following.length}
+          <Divider orientation="vertical" flexItem sx={{ height: 64, mx: 2 }} />
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              mx: 4,
+            }}
+          >
+            <Typography variant="h6" sx={{ color: theme.palette.text.primary }}>
+              {user.following ? user.following.length : 0}
             </Typography>
             <Typography
               variant="body2"
-              color="textSecondary"
-              className="text-black dark:text-white"
+              sx={{ color: theme.palette.text.secondary }}
             >
               Following
             </Typography>
@@ -87,28 +150,25 @@ const ProfileCard = ({ user }) => {
       <Box
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", md: "row" },
+          flexDirection: { xs: "column", lg: "row" },
           alignItems: "center",
+          mt: { xs: 4, lg: 0 },
         }}
       >
         <Button
           variant="contained"
           startIcon={<Share />}
-          className="bg-gray-600 hover:bg-gray-700"
           sx={{
-            marginBottom: { xs: 2, md: 0 },
-            marginRight: { md: 2 },
+            bgcolor: "grey.600",
+            "&:hover": { bgcolor: "grey.700" },
+            mb: { xs: 2, lg: 0 },
+            mr: { lg: 2 },
           }}
+          onClick={handleShare}
         >
           Share
         </Button>
-        {location.pathname === "/edit-profile" ? (
-          <Link to="/profile">
-            <Button variant="contained" color="secondary">
-              View Profile
-            </Button>
-          </Link>
-        ) : (
+        {user._id === currentUser._id && (
           <Link to="/edit-profile">
             <Button variant="contained" color="secondary">
               Edit Profile
@@ -116,7 +176,20 @@ const ProfileCard = ({ user }) => {
           </Link>
         )}
       </Box>
-    </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+    </Paper>
   );
 };
 

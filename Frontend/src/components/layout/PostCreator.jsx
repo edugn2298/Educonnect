@@ -1,6 +1,13 @@
 import { useState, useContext } from "react";
 import PropTypes from "prop-types";
-import { TextField, Button, IconButton, Box } from "@mui/material";
+import {
+  TextField,
+  Button,
+  IconButton,
+  Box,
+  Paper,
+  Typography,
+} from "@mui/material";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import Delete from "@mui/icons-material/Delete";
 import { styled } from "@mui/material/styles";
@@ -17,6 +24,7 @@ const PostCreator = ({ onSubmit }) => {
   const [text, setText] = useState("");
   const [image, setImage] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [error, setError] = useState("");
 
   const handleTextChange = (e) => {
     setText(e.target.value);
@@ -24,7 +32,6 @@ const PostCreator = ({ onSubmit }) => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    console.log(file);
     if (file) {
       setImage(URL.createObjectURL(file));
       setImageFile(file);
@@ -38,36 +45,38 @@ const PostCreator = ({ onSubmit }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!text && !imageFile) {
+      setError("The content and image cannot be both empty.");
+      setTimeout(() => setError(""), 3000); // Eliminar el mensaje de error después de 3 segundos
+      return;
+    }
+    setError("");
     const formData = new FormData();
     formData.append("author", currentUser._id);
     formData.append("content", text);
     if (imageFile) {
       formData.append("image", imageFile);
     }
-    console.log(JSON.stringify(formData.entries()));
     try {
       const response = await createPost(formData);
-      // Llamar a onSubmit con éxito
       onSubmit(true, response.data.message);
-      // Reset form
       setText("");
       setImage(null);
       setImageFile(null);
     } catch (error) {
       console.error(error);
-      // Llamar a onSubmit con error
       onSubmit(false, "Hubo un error al crear el post.");
     }
   };
 
   return (
-    <Box
+    <Paper
       component="form"
       sx={{
-        bgcolor: "background.paper",
+        bgcolor: "background.default",
         color: "text.primary",
         p: 4,
-        borderRadius: 1,
+        borderRadius: 2,
         boxShadow: 3,
         maxWidth: 600,
         width: "100%",
@@ -81,10 +90,15 @@ const PostCreator = ({ onSubmit }) => {
         multiline
         rows={4}
         variant="outlined"
-        placeholder="¿Qué estás pensando?"
+        placeholder="What's on your mind?"
         value={text}
         onChange={handleTextChange}
-        sx={{ mb: 2 }}
+        sx={{ mb: 2, bgcolor: "background.paper", color: "text.primary" }}
+        InputProps={{
+          sx: {
+            color: "text.primary",
+          },
+        }}
       />
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <label htmlFor="upload-image">
@@ -122,10 +136,15 @@ const PostCreator = ({ onSubmit }) => {
           />
         </Box>
       )}
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
       <Button variant="contained" color="primary" type="submit" fullWidth>
         Post It
       </Button>
-    </Box>
+    </Paper>
   );
 };
 

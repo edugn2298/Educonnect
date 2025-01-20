@@ -25,18 +25,51 @@ const CheckEmail = () => {
   };
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center bg-gradient-to-r from-indigo-400 to-cyan-400 dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-700">
-      <Box className="flex flex-col items-center gap-4 rounded-md p-8 border border-gray-300 bg-gray-100 w-11/12 sm:w-5/6 md:w-4/5 lg:w-3/5 xl:w-2/5 2xl:w-1/3">
-        <img src={logo} alt="logo" className="w-40 mb-6" />
-        <Typography variant="h5" className="mb-4">
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+        background: (theme) =>
+          theme.palette.mode === "dark"
+            ? "linear-gradient(to right, #2e3b55, #243b4d)"
+            : "linear-gradient(to right, #4b6cb7, #182848)",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 2,
+          p: 4,
+          borderRadius: 2,
+          boxShadow: 3,
+          backgroundColor: (theme) => theme.palette.background.paper,
+          maxWidth: {
+            xs: "90%", // max width for extra small screens
+            sm: "80%", // max width for small screens
+            md: "70%", // max width for medium screens
+            lg: "60%", // max width for large screens
+            xl: "50%", // max width for extra large screens
+          },
+        }}
+      >
+        <img
+          src={logo}
+          alt="logo"
+          style={{ width: "160px", marginBottom: "24px" }}
+        />
+        <Typography variant="h5" sx={{ mb: 2 }}>
           Check Your Email
         </Typography>
-        <Typography variant="body1" className="mb-4">
-          We`&apos;ve sent a password reset link to your email address. If you
-          don`&apos;t see it, check your spam folder.
+        <Typography variant="body1" sx={{ mb: 2 }}>
+          We`&apos;`ve sent a password reset link to your email address. If you
+          don`&apos;`t see it, check your spam folder.
         </Typography>
-        <form onSubmit={handleFormSubmit} className="w-full">
-          <Typography variant="body1" className="mb-4">
+        <form onSubmit={handleFormSubmit} style={{ width: "100%" }}>
+          <Typography variant="body1" sx={{ mb: 2 }}>
             If you received a code, paste it here to complete the password reset
             process.
           </Typography>
@@ -48,14 +81,14 @@ const CheckEmail = () => {
             onChange={(e) => setCode(e.target.value)}
             fullWidth
             required
-            className="mb-4"
+            sx={{ mb: 2 }}
           />
           <Button
             type="submit"
             variant="contained"
             color="primary"
             fullWidth
-            className="mb-4"
+            sx={{ mb: 2 }}
           >
             Complete Reset
           </Button>
@@ -65,7 +98,7 @@ const CheckEmail = () => {
           variant="outlined"
           color="secondary"
           fullWidth
-          className="mb-4"
+          sx={{ mb: 2 }}
         >
           Resend Email
         </Button>
@@ -78,7 +111,7 @@ const CheckEmail = () => {
           Back to Login
         </Button>
       </Box>
-    </div>
+    </Box>
   );
 };
 

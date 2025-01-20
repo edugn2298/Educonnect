@@ -11,6 +11,7 @@ import mongoose from "mongoose";
  * @param {*} res - The response object
  * @returns {Object} - The posts
  */
+
 export const getFilteredPosts = async (req, res) => {
   try {
     const {
@@ -25,16 +26,26 @@ export const getFilteredPosts = async (req, res) => {
     } = req.query;
 
     // Construimos el objeto de coincidencia dinámicamente
-    const match = {};
+    const match = { deleted: false }; // Aseguramos que no se traigan posts eliminados
 
     if (authorId) match.author = mongoose.Types.ObjectId(authorId);
     if (content) match.content = new RegExp(content, "i"); // Búsqueda insensible a mayúsculas/minúsculas
     if (hashtags) match.hashtags = { $in: hashtags.split(",") };
     if (typeof deleted !== "undefined") match.deleted = deleted === "true";
-    if (startDate)
-      match.createdAt = { ...match.createdAt, $gte: new Date(startDate) };
-    if (endDate)
-      match.createdAt = { ...match.createdAt, $lte: new Date(endDate) };
+    if (startDate) {
+      const [month, day, year] = startDate.split("/");
+      match.createdAt = {
+        ...match.createdAt,
+        $gte: new Date(year, month - 1, day),
+      };
+    }
+    if (endDate) {
+      const [month, day, year] = endDate.split("/");
+      match.createdAt = {
+        ...match.createdAt,
+        $lte: new Date(year, month - 1, day),
+      };
+    }
 
     const options = {
       page: parseInt(page, 10),

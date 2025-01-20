@@ -8,6 +8,8 @@ import fs from "fs";
  * @param {Object} req - Objeto de solicitud HTTP
  * @param {Object} res - Objeto de respuesta HTTP
  */
+import mongoose from "mongoose";
+
 export const getFilteredTransactions = async (req, res) => {
   try {
     const {
@@ -15,6 +17,7 @@ export const getFilteredTransactions = async (req, res) => {
       currency,
       status,
       paymentMethod,
+      amount,
       startDate,
       endDate,
       page = 1,
@@ -24,18 +27,33 @@ export const getFilteredTransactions = async (req, res) => {
     const match = { deleted: false };
 
     if (userId) match.user = mongoose.Types.ObjectId(userId);
-    if (currency) match.currency = currency;
-    if (status) match.status = status;
-    if (paymentMethod) match.paymentMethod = paymentMethod;
-    if (startDate)
-      match.createdAt = { ...match.createdAt, $gte: new Date(startDate) };
-    if (endDate)
-      match.createdAt = { ...match.createdAt, $lte: new Date(endDate) };
+    if (currency) match.currency = new RegExp(`${currency}`, "i"); // Coincidencia parcial e insensible a mayúsculas
+    if (status) match.status = new RegExp(`${status}`, "i"); // Coincidencia parcial e insensible a mayúsculas
+    if (paymentMethod)
+      match.paymentMethod = new RegExp(`${paymentMethod}`, "i"); // Coincidencia parcial e insensible a mayúsculas
+    if (amount) match.amount = parseFloat(amount); // Comparación exacta para cantidad
+    if (startDate) {
+      const [day, month, year] = startDate.split("/");
+      match.createdAt = {
+        ...match.createdAt,
+        $gte: new Date(year, month - 1, day),
+      };
+    }
+    if (endDate) {
+      const [day, month, year] = endDate.split("/");
+      match.createdAt = {
+        ...match.createdAt,
+        $lte: new Date(year, month - 1, day),
+      };
+    }
 
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
-      populate: "user",
+      populate: {
+        path: "user",
+        select: "username profilePicture",
+      },
     };
 
     const transactions = await Transaction.paginate(match, options);

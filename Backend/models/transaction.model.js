@@ -12,14 +12,19 @@ const transactionSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    transactionId: {
+      type: String,
+      required: true,
+    },
     currency: {
       type: String,
       required: true,
     },
     status: {
       type: String,
-      enum: ["completed", "failed"],
+      enum: ["completed", "pending", "failed"],
       required: true,
+      default: "pending",
     },
     paymentMethod: {
       type: String,

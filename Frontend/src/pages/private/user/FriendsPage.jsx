@@ -13,8 +13,15 @@ const FriendsPage = () => {
 
   return (
     <Box
-      sx={{ width: "100vw", minHeight: "100vh", display: "flex" }}
-      className="bg-gradient-to-r from-indigo-400 to-cyan-400 dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-700"
+      sx={{
+        width: "100vw",
+        minHeight: "100vh",
+        display: "flex",
+        background: (theme) =>
+          theme.palette.mode === "dark"
+            ? "linear-gradient(to right, #2e3b55, #243b4d)"
+            : "linear-gradient(to right, #4b6cb7, #182848)",
+      }}
     >
       <Sidebar />
       <Box

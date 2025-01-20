@@ -51,8 +51,6 @@ export const getUserById = async (req, res) => {
  * @example http://localhost:3050/users/update/:id
  */
 export const updateUser = async (req, res) => {
-  console.log(req.body);
-  console.log(req.file);
   try {
     const { id } = req.params;
     const updates = req.body;
@@ -243,5 +241,51 @@ export const searchUsers = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: "An error occurred while searching users" });
+  }
+};
+
+/**
+ * Search following users by fullname or username
+ * @function searchFollowing
+ * @async
+ * @param {Object} req - The request object
+ * @param {Object} res - The response object
+ * @param {string} req.params.id - The ID of the user whose following are to be searched
+ * @param {string} req.query.q - The search query
+ * @returns {Object} - The found users
+ * @require - authenticate middleware
+ * @method GET
+ * @example http://localhost:3005/users/:id/following?q=hello
+ */
+export const searchFollowing = async (req, res) => {
+  console.log(req.params);
+  console.log(req.query);
+  try {
+    const { id } = req.params;
+    const { q } = req.query;
+
+    const user = await User.findById(id).populate("following");
+    if (!user) {
+      return res.status(404).json({ error: "Usuario no encontrado" });
+    }
+
+    const following = await User.find(
+      {
+        $and: [
+          { _id: { $in: user.following } },
+          {
+            $or: [
+              { fullname: { $regex: q, $options: "i" } },
+              { username: { $regex: q, $options: "i" } },
+            ],
+          },
+        ],
+      },
+      { _id: 1, fullname: 1, profilePicture: 1, username: 1 }
+    );
+
+    res.json(following);
+  } catch (error) {
+    res.status(500).json({ error: "Ocurrió un error al buscar usuarios" });
   }
 };

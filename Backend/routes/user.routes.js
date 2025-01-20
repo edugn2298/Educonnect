@@ -10,6 +10,7 @@ import {
   getFollowers,
   getFollowing,
   searchUsers,
+  searchFollowing,
 } from "../controllers/user.controller.js";
 import uploadImage from "../middlewares/uploadImage.js";
 import upload from "../middlewares/uploadImage.js";
@@ -57,5 +58,11 @@ router.get(
 );
 
 router.get("/search", authenticate, authorize(["user", "admin"]), searchUsers);
+router.get(
+  "/sf/:id",
+  authenticate,
+  authorize(["user", "admin"]),
+  searchFollowing
+);
 
 export default router;

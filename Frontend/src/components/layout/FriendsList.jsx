@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   Box,
   List,
-  ListItem,
   ListItemText,
   Button,
   Typography,
@@ -15,7 +14,10 @@ import {
   MenuItem,
   Snackbar,
   Alert,
+  IconButton,
+  Paper,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import {
   getFollowers,
   getFollowing,
@@ -24,6 +26,9 @@ import {
   searchUsers,
 } from "../../services/auth";
 import { PropTypes } from "prop-types";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import { useTheme } from "@mui/material/styles";
 
 const FriendsList = ({ currentUser, onProfileView }) => {
   const [listType, setListType] = useState("followers");
@@ -40,8 +45,9 @@ const FriendsList = ({ currentUser, onProfileView }) => {
     message: "",
     severity: "",
   });
+  const theme = useTheme();
+  const navigate = useNavigate();
 
-  // Fetch followers and following lists on initial load
   useEffect(() => {
     const fetchLists = async () => {
       setLoading(true);
@@ -64,7 +70,6 @@ const FriendsList = ({ currentUser, onProfileView }) => {
     fetchLists();
   }, [currentUser._id]);
 
-  // Fetch lists based on listType
   useEffect(() => {
     const fetchListsBasedOnType = async () => {
       setLoading(true);
@@ -108,22 +113,13 @@ const FriendsList = ({ currentUser, onProfileView }) => {
   const renderFollowButton = (friend) => {
     const isFollowing = following.some((f) => f._id === friend._id);
     return isFollowing ? (
-      <Button
-        variant="outlined"
-        color="error"
-        onClick={() => handleUnfollow(friend._id)} // Cambiado a friend._id
-        sx={{ ml: 2 }}
-      >
-        Unfollow
-      </Button>
+      <IconButton color="error" onClick={() => handleUnfollow(friend._id)}>
+        <PersonRemoveIcon />
+      </IconButton>
     ) : (
-      <Button
-        variant="outlined"
-        onClick={() => handleFollow(friend._id)} // Cambiado a friend._id
-        sx={{ ml: 2 }}
-      >
-        Follow
-      </Button>
+      <IconButton color="primary" onClick={() => handleFollow(friend._id)}>
+        <PersonAddIcon />
+      </IconButton>
     );
   };
 
@@ -140,11 +136,7 @@ const FriendsList = ({ currentUser, onProfileView }) => {
       const updatedFollowers = await getFollowers(currentUser._id);
       setFollowers(updatedFollowers.data);
     } catch (error) {
-      setAlert({
-        open: true,
-        message: error.response.data,
-        severity: "error",
-      });
+      setAlert({ open: true, message: error.response.data, severity: "error" });
     }
   };
 
@@ -161,11 +153,7 @@ const FriendsList = ({ currentUser, onProfileView }) => {
       const updatedFollowers = await getFollowers(currentUser._id);
       setFollowers(updatedFollowers.data);
     } catch (error) {
-      setAlert({
-        open: true,
-        message: error.response.data,
-        severity: "error",
-      });
+      setAlert({ open: true, message: error.response.data, severity: "error" });
     }
   };
 
@@ -173,31 +161,65 @@ const FriendsList = ({ currentUser, onProfileView }) => {
     setAlert({ open: false, message: "", severity: "" });
   };
 
+  const handleNavigate = (id) => {
+    navigate(`/profile/${id}`);
+  };
+
   const renderListItems = (friendsList) => {
     return friendsList.map((friend) => (
-      <ListItem
+      <Paper
         key={friend._id}
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          p: 2,
+          mb: 1,
+          bgcolor: theme.palette.background.default,
+          borderRadius: 2,
+          boxShadow: 1,
+          transition: "all 0.3s ease",
+          "&:hover": {
+            boxShadow: 3,
+            transform: "scale(1.02)",
+          },
         }}
       >
-        <Avatar
-          src={friend.profilePicture}
-          alt={friend.fullname}
-          sx={{ mr: 2 }}
-        />
-        <ListItemText primary={friend.fullname} secondary={friend.username} />
-        <Button
-          variant="contained"
-          onClick={() => onProfileView(friend._id)}
-          sx={{ ml: 2 }}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            cursor: "pointer",
+          }}
+          onClick={() => handleNavigate(friend._id)}
         >
-          View Profile
-        </Button>
-        {renderFollowButton(friend)}
-      </ListItem>
+          <Avatar
+            src={friend.profilePicture}
+            alt={friend.fullname}
+            sx={{ mr: 2 }}
+          />
+          <ListItemText
+            primary={<Typography variant="body1">{friend.fullname}</Typography>}
+            secondary={
+              <Typography
+                variant="body2"
+                color="textSecondary"
+              >{`@${friend.username}`}</Typography>
+            }
+          />
+        </Box>
+        <Box>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => onProfileView(friend._id)}
+            sx={{ mr: 1 }}
+          >
+            View
+          </Button>
+          {renderFollowButton(friend)}
+        </Box>
+      </Paper>
     ));
   };
 
@@ -213,7 +235,10 @@ const FriendsList = ({ currentUser, onProfileView }) => {
 
   return (
     <Box sx={{ width: "100%", maxWidth: 600, mx: "auto", mt: 4 }}>
-      <Typography variant="h5" sx={{ mb: 2, textAlign: "center" }}>
+      <Typography
+        variant="h5"
+        sx={{ mb: 2, textAlign: "center", color: theme.palette.text.primary }}
+      >
         {listType === "followers" ? "My Followers" : "My Following"}
       </Typography>
       <FormControl fullWidth sx={{ mb: 2 }}>
@@ -222,6 +247,7 @@ const FriendsList = ({ currentUser, onProfileView }) => {
           labelId="list-type-label"
           value={listType}
           onChange={(e) => setListType(e.target.value)}
+          sx={{ bgcolor: theme.palette.background.paper, borderRadius: 1 }}
         >
           <MenuItem value="followers">Followers</MenuItem>
           <MenuItem value="following">Following</MenuItem>
@@ -233,10 +259,20 @@ const FriendsList = ({ currentUser, onProfileView }) => {
         variant="outlined"
         value={searchQuery}
         onChange={(e) => handleSearch(e.target.value)}
-        sx={{ mb: 2 }}
+        sx={{ mb: 2, bgcolor: theme.palette.background.paper, borderRadius: 1 }}
+        InputProps={{
+          sx: { color: theme.palette.text.primary },
+        }}
       />
       {friendsToRender.length === 0 && !searchQuery && (
-        <Typography variant="body1" sx={{ textAlign: "center", mt: 4 }}>
+        <Typography
+          variant="body1"
+          sx={{
+            textAlign: "center",
+            mt: 4,
+            color: theme.palette.text.secondary,
+          }}
+        >
           You don&apos;t have any {listType} yet.
         </Typography>
       )}
@@ -247,11 +283,25 @@ const FriendsList = ({ currentUser, onProfileView }) => {
       </List>
       {searchQuery && (
         <>
-          <Typography variant="h6" sx={{ mt: 2, textAlign: "center" }}>
+          <Typography
+            variant="h6"
+            sx={{
+              mt: 2,
+              textAlign: "center",
+              color: theme.palette.text.primary,
+            }}
+          >
             Global Search Results
           </Typography>
           {searchResults.global.length === 0 ? (
-            <Typography variant="body1" sx={{ textAlign: "center", mt: 2 }}>
+            <Typography
+              variant="body1"
+              sx={{
+                textAlign: "center",
+                mt: 2,
+                color: theme.palette.text.secondary,
+              }}
+            >
               No users found.
             </Typography>
           ) : (

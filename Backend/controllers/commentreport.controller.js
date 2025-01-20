@@ -3,7 +3,7 @@ import PDFDocument from "pdfkit";
 import fs from "fs";
 import mongoose from "mongoose";
 
-/*
+/**
  * @function getFilteredComments
  * @async
  * @param {Object} req - The request object.
@@ -49,7 +49,7 @@ export const getFilteredComments = async (req, res) => {
   }
 };
 
-/*
+/**
  * @function downloadPDFReport
  * @async
  * @param {Object} req - The request object.

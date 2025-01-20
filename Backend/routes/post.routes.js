@@ -7,6 +7,7 @@ import {
   updatePost,
   deletePost,
   feedPosts,
+  likePost,
 } from "../controllers/post.controller.js";
 import uploadImage from "../middlewares/uploadImage.js";
 
@@ -72,5 +73,16 @@ routerPost.post(
  * @description Get feed posts
  */
 routerPost.get("/feed", authenticate, authorize(["user", "admin"]), feedPosts);
+
+/**
+ * @method PATCH
+ * @description Like post
+ */
+routerPost.patch(
+  "/like/:id",
+  authenticate,
+  authorize(["user", "admin"]),
+  likePost
+);
 
 export default routerPost;

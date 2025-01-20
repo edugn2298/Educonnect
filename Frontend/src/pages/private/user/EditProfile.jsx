@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import Sidebar from "../../../components/layout/Sidebar";
 import ProfileCard from "../../../components/layout/ProfileCard";
 import ProfileInfo from "../../../components/layout/ProfileInfo";
-import { Button, Box } from "@mui/material";
+import { Button, Box, Typography } from "@mui/material";
 import { useAuth } from "../../../context/AuthContext";
 import { getUser, updateUser } from "../../../services/auth";
 
@@ -54,8 +54,11 @@ export const EditProfile = () => {
         width: "100vw",
         minHeight: "100vh",
         display: "flex",
+        background: (theme) =>
+          theme.palette.mode === "dark"
+            ? "linear-gradient(to right, #2e3b55, #243b4d)"
+            : "linear-gradient(to right, #4b6cb7, #182848)",
       }}
-      className="bg-gradient-to-r from-indigo-400 to-cyan-400 dark:bg-gradient-to-r dark:from-slate-900 dark:to-slate-700"
     >
       <Sidebar />
       <Box
@@ -68,11 +71,18 @@ export const EditProfile = () => {
         }}
       >
         <ProfileCard user={userDetails?.data || currentUser} />
-        <h1 className="text-3xl font-bold text-gray-700 dark:text-gray-200 mt-4">
+        <Typography
+          variant="h3"
+          sx={{
+            fontWeight: "bold",
+            color: (theme) => theme.palette.text.primary,
+            mt: 4,
+          }}
+        >
           Edit Profile
-        </h1>
+        </Typography>
         {isLoading ? (
-          <p>Loading...</p>
+          <Typography>Loading...</Typography>
         ) : (
           userDetails && (
             <ProfileInfo
@@ -82,11 +92,10 @@ export const EditProfile = () => {
             />
           )
         )}
-        <div className="flex justify-end m-4">
+        <Box sx={{ display: "flex", justifyContent: "flex-end", m: 4, gap: 1 }}>
           <Button
             variant="contained"
             color="primary"
-            className="mr-2"
             onClick={() => setIsEditing(!isEditing)}
           >
             {isEditing ? "Cancel" : "Edit Profile"}
@@ -97,7 +106,7 @@ export const EditProfile = () => {
           <Button variant="contained" color="primary">
             Log Out
           </Button>
-        </div>
+        </Box>
       </Box>
     </Box>
   );

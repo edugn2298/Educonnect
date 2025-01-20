@@ -27,6 +27,10 @@ const subscriptionSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  delete: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Añadir el plugin de paginación al esquema

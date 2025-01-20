@@ -15,12 +15,10 @@ import mongoose from "mongoose";
 export const getFilteredMessages = async (req, res) => {
   try {
     const {
-      senderId,
-      receiverId,
+      chat,
+      sender,
       content,
-      read,
-      startDate,
-      endDate,
+      createdAt,
       page = 1,
       limit = 10,
     } = req.query;
@@ -28,19 +26,15 @@ export const getFilteredMessages = async (req, res) => {
     // Construimos el objeto de coincidencia dinámicamente
     const match = {};
 
-    if (senderId) match.sender = mongoose.Types.ObjectId(senderId);
-    if (receiverId) match.receiver = mongoose.Types.ObjectId(receiverId);
+    if (chat) match.chat = mongoose.Types.ObjectId(chat);
+    if (sender) match.sender = mongoose.Types.ObjectId(sender);
     if (content) match.content = new RegExp(content, "i"); // Búsqueda insensible a mayúsculas/minúsculas
-    if (typeof read !== "undefined") match.read = read === "true";
-    if (startDate)
-      match.createdAt = { ...match.createdAt, $gte: new Date(startDate) };
-    if (endDate)
-      match.createdAt = { ...match.createdAt, $lte: new Date(endDate) };
-
+    if (createdAt)
+      match.createdAt = { ...match.createdAt, $gte: new Date(crea) };
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
-      populate: ["sender", "receiver"],
+      populate: { path: "sender", select: "username profilePicture" },
       sort: { createdAt: -1 },
     };
 

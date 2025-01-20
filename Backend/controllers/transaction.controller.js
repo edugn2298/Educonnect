@@ -11,13 +11,15 @@ import Transaction from "../models/transaction.model.js";
  */
 export const createTransaction = async (req, res) => {
   try {
-    const { user, amount, currency, status, paymentMethod } = req.body;
+    const { user, amount, currency, status, paymentMethod, transactionId } =
+      req.body;
     const transaction = new Transaction({
       user,
       amount,
       currency,
       status,
       paymentMethod,
+      transactionId,
     });
     await transaction.save();
     res.status(201).json({ message: "Transaction created successfully" });
@@ -110,7 +112,10 @@ export const getTransactionById = async (req, res) => {
     if (!transaction) {
       return res.status(404).json({ error: "Transaction not found" });
     }
-    res.status(200).json(transaction);
+    res.status(200).json({
+      message: "Transaction retrieved successfully",
+      transaction: transaction,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -128,7 +133,10 @@ export const getTransactionById = async (req, res) => {
  */
 export const getTransactionsByUser = async (req, res) => {
   try {
-    const transactions = await Transaction.find({ user: req.params.id });
+    const transactions = await Transaction.find({
+      user: req.params.id,
+      deleted: false,
+    });
     res.status(200).json(transactions);
   } catch (error) {
     res.status(500).json({ error: error.message });

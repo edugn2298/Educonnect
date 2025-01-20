@@ -1,7 +1,6 @@
 import User from "../models/user.model.js";
 import PDFDocument from "pdfkit";
 import fs from "fs";
-import mongoose from "mongoose";
 
 /**
  * get filtered users
@@ -26,7 +25,7 @@ export const getFilteredUsers = async (req, res) => {
     } = req.query;
 
     // Construimos el objeto de coincidencia dinámicamente
-    const match = {};
+    const match = { deleted: false };
 
     if (username) match.username = new RegExp(username, "i"); // Búsqueda insensible a mayúsculas/minúsculas
     if (email) match.email = new RegExp(email, "i"); // Búsqueda insensible a mayúsculas/minúsculas

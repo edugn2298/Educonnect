@@ -61,8 +61,19 @@ routerComment.patch(
 routerComment.patch(
   "/delete/:commentId",
   authenticate,
-  authorize(["admin"]),
+  authorize(["user", "admin"]),
   deleteComment
+);
+
+/**
+ * @method GET
+ * @description Get comments by post
+ */
+routerComment.get(
+  "/commentsbypost/:postId",
+  authenticate,
+  authorize(["user", "admin"]),
+  getCommentsByPostId
 );
 
 export default routerComment;

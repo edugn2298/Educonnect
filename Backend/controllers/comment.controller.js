@@ -1,4 +1,3 @@
-import { get } from "mongoose";
 import Comment from "../models/comment.model.js";
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
@@ -13,6 +12,8 @@ import User from "../models/user.model.js";
  * @example http://localhost:3050/comments
  */
 export const createComment = async (req, res) => {
+  console.log(req.body);
+  console.log(req.user);
   try {
     const { postId, content } = req.body;
     const post = await Post.findById(postId);
@@ -28,10 +29,14 @@ export const createComment = async (req, res) => {
       author: user._id,
       post: post._id,
     });
+    console.log(comment);
     post.comments.push(comment._id);
     await post.save();
-    res.status(201).json(comment);
+    res
+      .status(201)
+      .json({ message: "Comment created successfully", comment: comment });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -70,7 +75,13 @@ export const deleteComment = async (req, res) => {
  */
 export const getAllComments = async (req, res) => {
   try {
-    const comments = await Comment.find({ deleted: false });
+    const { page = 1, limit = 10 } = req.query;
+    const options = {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+      sort: { createdAt: -1 },
+    };
+    const comments = await Comment.paginate({ deleted: false }, options);
     res.status(200).json(comments);
   } catch (error) {
     res.status(500).json({ error: error.message });

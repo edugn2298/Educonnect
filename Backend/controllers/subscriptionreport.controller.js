@@ -1,5 +1,4 @@
 import Subscription from "../models/subscription.model.js";
-import PDFDocument from "pdfkit";
 import fs from "fs";
 import mongoose from "mongoose";
 
@@ -36,8 +35,10 @@ export const getFilteredSubscriptions = async (req, res) => {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
-      populate: "user",
-      sort: { createdAt: -1 },
+      populate: {
+        path: "user",
+        select: "username profilePicture",
+      },
     };
 
     const subscriptions = await Subscription.paginate(match, options);

@@ -62,3 +62,22 @@ export const updatePost = async (id, formData) => {
     throw new Error("Update failed");
   }
 };
+
+export const likePost = async (id) => {
+  try {
+    const response = await authApi.patch(`/posts/like/${id}`);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getFilteredPosts = async (filters) => {
+  try {
+    const params = new URLSearchParams(filters).toString();
+    const response = await authApi.get(`/postreport`, params);
+    return response;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

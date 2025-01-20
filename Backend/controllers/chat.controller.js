@@ -65,7 +65,7 @@ export const getChatsForUser = async (req, res) => {
     })
       .populate({
         path: "members",
-        select: "fullname profilePicture",
+        select: "fullname profilePicture username",
         match: { _id: { $ne: req.user._id } },
       })
       .lean();

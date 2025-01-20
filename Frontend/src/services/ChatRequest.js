@@ -33,7 +33,7 @@ export const findChat = async (currentUser, id) => {
 
 export const deleteChat = async (id) => {
   try {
-    const response = await authApi.delete(`/chats/delete/${id}`);
+    const response = await authApi.patch(`/chats/delete/${id}`);
     return response;
   } catch (error) {
     throw error.response.data;

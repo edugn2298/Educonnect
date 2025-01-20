@@ -263,6 +263,16 @@ export const feedPosts = async (req, res) => {
       deleted: false,
     })
       .populate("author") // Incluye la información del autor
+      .populate("comments")
+      .populate({
+        path: "comments",
+        options: { sort: { createdAt: -1 } },
+        populate: {
+          path: "author",
+          model: "User",
+          select: "username fullname profilePicture",
+        },
+      })
       .sort({ createdAt: -1 }) // Ordenar por fecha de creación, más reciente primero
       .skip(offset)
       .limit(limit);
@@ -279,5 +289,34 @@ export const feedPosts = async (req, res) => {
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const likePost = async (req, res) => {
+  console.log(req.params.id);
+  console.log(req.user.id);
+  try {
+    const postId = req.params.id;
+    const userId = req.user.id;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    if (post.likes.includes(userId)) {
+      await Post.findByIdAndUpdate(postId, {
+        $pull: { likes: userId },
+      });
+      return res.status(200).json({ success: "Post unliked successfully" });
+    } else {
+      await Post.findByIdAndUpdate(postId, {
+        $addToSet: { likes: userId },
+      });
+      return res.status(200).json({ success: "Post liked successfully" });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 };

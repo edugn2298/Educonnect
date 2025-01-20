@@ -1,6 +1,19 @@
-import { Box, Avatar, Typography, Button } from "@mui/material";
+import {
+  Box,
+  Avatar,
+  Button,
+  TextField,
+  Paper,
+  IconButton,
+} from "@mui/material";
 import PropTypes from "prop-types";
 import { useState } from "react";
+import { styled } from "@mui/material/styles";
+import EditIcon from "@mui/icons-material/Edit";
+
+const Input = styled("input")({
+  display: "none",
+});
 
 const ProfileInfo = ({ user, onSave, editable = false }) => {
   const [formData, setFormData] = useState({
@@ -31,136 +44,117 @@ const ProfileInfo = ({ user, onSave, editable = false }) => {
     if (formData.photo) {
       data.append("photo", formData.photo);
     }
-    console.log("Form Data desde profile info:", data);
     onSave(formData);
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <Box className="p-6 shadow-lg rounded-lg bg-white dark:bg-gray-800">
-        <Box className="flex justify-center mb-6">
+      <Paper
+        elevation={3}
+        sx={{
+          p: 6,
+          borderRadius: 2,
+          bgcolor: "background.default",
+        }}
+      >
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 6 }}>
           <Avatar
             src={user.profilePicture}
             alt={user.fullname}
-            className="w-24 h-24"
+            sx={{ width: 96, height: 96, mb: 2 }}
           />
           {editable && (
-            <input
-              type="file"
-              name="photo"
-              accept="image/*"
-              onChange={handleChange}
-            />
+            <label htmlFor="photo-upload">
+              <Input
+                id="photo-upload"
+                type="file"
+                name="photo"
+                accept="image/*"
+                onChange={handleChange}
+              />
+              <IconButton component="span">
+                <EditIcon />
+              </IconButton>
+            </label>
           )}
         </Box>
-        <Box className="grid grid-cols-1 gap-4 md:grid-cols-2 mb-4">
-          <Box className="flex flex-col">
-            <Typography
-              variant="subtitle1"
-              className="mb-2 text-black dark:text-white"
-            >
-              Full Name
-            </Typography>
-            <input
-              type="text"
-              name="fullname"
-              value={formData.fullname}
-              onChange={handleChange}
-              className={`border-2 ${
-                editable
-                  ? "border-black dark:border-white"
-                  : "border-transparent"
-              } text-black dark:text-white bg-transparent rounded-lg p-2`}
-              readOnly={!editable}
-            />
-          </Box>
-          <Box className="flex flex-col">
-            <Typography
-              variant="subtitle1"
-              className="mb-2 text-black dark:text-white"
-            >
-              Email Address
-            </Typography>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={`border-2 ${
-                editable
-                  ? "border-black dark:border-white"
-                  : "border-transparent"
-              } text-black dark:text-white bg-transparent rounded-lg p-2`}
-              readOnly={!editable}
-            />
-          </Box>
-          <Box className="flex flex-col">
-            <Typography
-              variant="subtitle1"
-              className="mb-2 text-black dark:text-white"
-            >
-              Address
-            </Typography>
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              className={`border-2 ${
-                editable
-                  ? "border-black dark:border-white"
-                  : "border-transparent"
-              } text-black dark:text-white bg-transparent rounded-lg p-2`}
-              readOnly={!editable}
-            />
-          </Box>
-          <Box className="flex flex-col">
-            <Typography
-              variant="subtitle1"
-              className="mb-2 text-black dark:text-white"
-            >
-              Country
-            </Typography>
-            <input
-              type="text"
-              name="country"
-              value={formData.country}
-              onChange={handleChange}
-              className={`border-2 ${
-                editable
-                  ? "border-black dark:border-white"
-                  : "border-transparent"
-              } text-black dark:text-white bg-transparent rounded-lg p-2`}
-              readOnly={!editable}
-            />
-          </Box>
-        </Box>
-        <Box className="flex flex-col">
-          <Typography
-            variant="subtitle1"
-            className="mb-2 text-black dark:text-white"
-          >
-            Biography
-          </Typography>
-          <textarea
-            name="bio"
-            value={formData.bio}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 4,
+            mb: 4,
+          }}
+        >
+          <TextField
+            fullWidth
+            label="Full Name"
+            name="fullname"
+            value={formData.fullname}
             onChange={handleChange}
-            rows="4"
-            className={`border-2 ${
-              editable ? "border-black dark:border-white" : "border-transparent"
-            } text-black dark:text-white bg-transparent rounded-lg p-2`}
-            readOnly={!editable}
+            variant="outlined"
+            InputProps={{
+              readOnly: !editable,
+            }}
+            sx={{ gridColumn: "span 2" }}
+          />
+          <TextField
+            fullWidth
+            label="Email Address"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            variant="outlined"
+            InputProps={{
+              readOnly: !editable,
+            }}
+            sx={{ gridColumn: "span 2" }}
+          />
+          <TextField
+            fullWidth
+            label="Address"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            variant="outlined"
+            InputProps={{
+              readOnly: !editable,
+            }}
+          />
+          <TextField
+            fullWidth
+            label="Country"
+            name="country"
+            value={formData.country}
+            onChange={handleChange}
+            variant="outlined"
+            InputProps={{
+              readOnly: !editable,
+            }}
           />
         </Box>
+        <TextField
+          fullWidth
+          label="Biography"
+          name="bio"
+          value={formData.bio}
+          onChange={handleChange}
+          variant="outlined"
+          multiline
+          rows={4}
+          InputProps={{
+            readOnly: !editable,
+          }}
+        />
         {editable && (
-          <Box className="flex justify-end mt-4">
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 4 }}>
             <Button variant="contained" color="primary" type="submit">
               Save Changes
             </Button>
           </Box>
         )}
-      </Box>
+      </Paper>
     </form>
   );
 };

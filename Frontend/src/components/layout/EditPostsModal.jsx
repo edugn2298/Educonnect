@@ -7,11 +7,14 @@ import {
   Box,
   Typography,
   Modal,
+  Divider,
 } from "@mui/material";
 import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import Delete from "@mui/icons-material/Delete";
 import { styled } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
+import { useTheme } from "@mui/material/styles";
+
 const Input = styled("input")({
   display: "none",
 });
@@ -22,9 +25,9 @@ const EditPostModal = ({ open, handleClose, post, handleEdit }) => {
   const [initialContent, setInitialContent] = useState("");
   const [initialMedia, setInitialMedia] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const theme = useTheme();
 
   useEffect(() => {
-    console.log("Post:", post);
     if (post && typeof post === "object") {
       setContent(post.content);
       setInitialContent(post.content);
@@ -46,7 +49,6 @@ const EditPostModal = ({ open, handleClose, post, handleEdit }) => {
 
   const handleMediaChange = (e) => {
     const file = e.target.files[0];
-    console.log(file);
     if (file) {
       setMedia(file);
       setImagePreview(URL.createObjectURL(file));
@@ -72,14 +74,6 @@ const EditPostModal = ({ open, handleClose, post, handleEdit }) => {
       } catch (error) {
         console.error(error);
       }
-      /*
-      try {
-        const response = await updatePost(post._id, formData);
-        console.log(response);
-        handleClose();
-      } catch (error) {
-        console.error(error);
-      }*/
     } else {
       handleClose(); // Close modal if no changes were made
     }
@@ -90,27 +84,40 @@ const EditPostModal = ({ open, handleClose, post, handleEdit }) => {
       <Box
         component="form"
         sx={{
-          bgcolor: "background.paper",
+          bgcolor: "background.default",
           color: "text.primary",
           p: 4,
-          borderRadius: 1,
+          borderRadius: 2,
           boxShadow: 3,
           maxWidth: 600,
           width: "100%",
           mx: "auto",
           mt: 4,
+          position: "relative",
+          overflowY: "auto",
+          maxHeight: "80vh", // Limitar la altura del modal
         }}
         onSubmit={handleSave}
       >
         <IconButton
-          sx={{ position: "absolute", top: 8, right: 8 }}
+          sx={{
+            position: "absolute",
+            top: 8,
+            right: 8,
+            color: theme.palette.text.primary,
+          }}
           onClick={handleClose}
         >
           <CloseIcon />
         </IconButton>
-        <Typography variant="h6" component="h2">
+        <Typography
+          variant="h6"
+          component="h2"
+          sx={{ mb: 2, color: theme.palette.text.primary }}
+        >
           Editar Post
         </Typography>
+        <Divider sx={{ mb: 2 }} />
         <TextField
           fullWidth
           multiline
@@ -120,6 +127,11 @@ const EditPostModal = ({ open, handleClose, post, handleEdit }) => {
           value={content}
           onChange={handleContentChange}
           sx={{ mb: 2 }}
+          InputProps={{
+            sx: {
+              color: theme.palette.text.primary,
+            },
+          }}
         />
         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
           <label htmlFor="upload-image">
@@ -157,7 +169,12 @@ const EditPostModal = ({ open, handleClose, post, handleEdit }) => {
                   : URL.createObjectURL(imagePreview)
               }
               alt="Preview"
-              style={{ width: "100%", borderRadius: "8px" }}
+              style={{
+                width: "100%",
+                maxHeight: "50vh", // Limitar la altura de la imagen
+                objectFit: "contain",
+                borderRadius: "8px",
+              }}
             />
           </Box>
         )}
